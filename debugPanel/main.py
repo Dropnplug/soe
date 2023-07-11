@@ -13,22 +13,27 @@ def _getModels():
 
 @app.route("/setPoint", methods=["POST"])
 def _setPoint():
-    if fl.request.form["val"].replace('.','',1).isdigit():
-        if fl.request.form["val"].__contains__("."):
-            val = float(fl.request.form["val"])
+    data = fl.request.get_json(force=True)
+    if data["val"].replace('.','',1).isdigit():
+        if data["val"].__contains__("."):
+            val = float(data["val"])
         else:
-            val = int(fl.request.form["val"])
+            val = int(data["val"])
     else:
-        val = fl.request.form["val"]
-    pointRoute = fl.request.form["pointRoute"].split(",")
+        val = data["val"]
+    pointRoute = data["pointRoute"]
     erreur = setPoint(pointRoute, val)
     if erreur:
-        return f"Pas le bon type ou erreur sunspec {fl.request.form['val'].isdigit()}", 422
+        return f"Pas le bon type ou erreur sunspec {data['val'].isdigit()}", 422
     else:    
         return "Valeur mise à jour", 200
 
 @app.route("/", methods=["GET"])
 def index():
     return fl.render_template("/index.html")
+
+@app.route("/test", methods=["GET"])
+def test():
+    return fl.render_template("/test.html")
 
 app.run(host="0.0.0.0", debug=True, port=8080)

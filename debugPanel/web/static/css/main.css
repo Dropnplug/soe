@@ -1,9 +1,37 @@
 body {
-    background-color: rgb(25, 25, 25);
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, Geneva, Tahoma, sans-serif;
 }
 
-summary {
-    color: rgb(26, 125, 247);
+:root{
+    --bgDetails: #38bb98;
+    --bgPointEven: #38bb9831;
+    --bgPointOdd: #38bb9861;
+    --txtClair: rgb(255, 255, 255);
+    --txtSombre: rgb(0, 0, 0);
+}
+
+
+@keyframes notif {
+    from {
+        /* transform: translateY(2em); */
+    }
+    
+    to {
+        display: block;
+        top: 5em;
+    }
+}
+
+#notif {
+    animation: notif 150ms ease-in-out;
+    position: sticky;
+    top: -2em;
+    right: 50%;
+    left: 50%;
+    width: fit-content;
+    padding: 1em;
+    border-radius: 10px;
+    color: white;
+    background-color: rgb(0, 17, 112);
+    display: none;
 }
