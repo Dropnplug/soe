@@ -42,6 +42,11 @@ function buildTab(elemParent, models, chemin=[]) {
             if (checkObjectKeys(["name", "value"], value)){
                 // l'element est un point
                 // il faut inclure joliement la description et un champ pour écrire la value si on peut avec un bouton submit
+                if (typeof value["value"] == "number"){
+                    if (value["value"] % 1 != 0){
+                        value["value"] =  value["value"].toFixed(2)
+                    }
+                }
                 let elem = document.createElement("p")
                 elem.classList.add("point")
                 let divKey = document.createElement("span")
@@ -67,7 +72,7 @@ function buildTab(elemParent, models, chemin=[]) {
                                 optionELem.value = opt["value"]
                                 input.appendChild(optionELem)
                             }
-                        } else if (value["type"].startsWith("uint") == true){
+                        } else if (value["type"].startsWith("uint") == true || value["type"].startsWith("int") == true){
                             var input = document.createElement("input")
                             input.setAttribute("type", "number")
                         } else {
