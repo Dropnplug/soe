@@ -24,7 +24,14 @@ def mergeDico(dicoDocu, dicoOnduleur):
         res = {}
         for key, value in dicoOnduleur.items():
             if type(value) in [list, dict]:
-                res[key] = mergeDico(dicoDocu[key], value)
+                # /!\ temporaire fix sma
+                # c'est à cause d'une curve qui s'appelle module
+                try:
+                    # if key == "module":
+                    #     key = "curve"
+                    res[key] = mergeDico(dicoDocu[key], value)
+                except:
+                    print(key)
             else:
                 res[key] = dicoDocu[key]
                 res[key]["value"] = value
