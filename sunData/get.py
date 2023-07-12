@@ -33,6 +33,7 @@ def mergeDico(dicoDocu, dicoOnduleur):
                 except:
                     print(key)
             else:
+                # if "mandatory" in dicoDocu[key]:
                 res[key] = dicoDocu[key]
                 res[key]["value"] = value
         return res

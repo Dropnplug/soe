@@ -87,10 +87,10 @@ function buildTab(elemParent, models, chemin=[]) {
 
                         input.setAttribute("value", value["value"])
                         input.classList.add("value")
-                        if (value["value"] == null){
-                            input.setAttribute("disabled", "disabled")
-                            submit.setAttribute("disabled", "disabled")
-                        }
+                        // if (value["value"] == null){
+                        //     input.setAttribute("disabled", "disabled")
+                        //     submit.setAttribute("disabled", "disabled")
+                        // }
 
                         elem.appendChild(input)
                         elem.appendChild(submit)
