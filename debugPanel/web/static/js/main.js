@@ -61,7 +61,7 @@ function buildTab(elemParent, models, chemin=[]) {
                     if (value["access"] == "RW"){
                         let submit = document.createElement("button")
                         
-                        if (value["type"].startsWith("enum") == true){
+                        if (value["type"].startsWith("enum") == true || value["type"].startsWith("bit") == true && value["symbols"] != null){
                             var input = document.createElement("select")
                             for (opt of value["symbols"]){
                                 let optionELem = document.createElement("option")
@@ -87,10 +87,14 @@ function buildTab(elemParent, models, chemin=[]) {
 
                         input.setAttribute("value", value["value"])
                         input.classList.add("value")
-                        // if (value["value"] == null){
-                        //     input.setAttribute("disabled", "disabled")
-                        //     submit.setAttribute("disabled", "disabled")
-                        // }
+                        if (value["value"] == null){
+                            input.setAttribute("disabled", "disabled")
+                            submit.setAttribute("disabled", "disabled")
+                            if (value["mandatory"] != null){
+                                input.style.backgroundColor = "pink"
+                                console.log(value)
+                            }
+                        }
 
                         elem.appendChild(input)
                         elem.appendChild(submit)
