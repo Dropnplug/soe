@@ -14,15 +14,9 @@ def setPoint(pointRoute, val):
             point = point.__getattr__(elem)
         else:
             point = point[int(elem)]
-    # if point.sf_required:
-    #     val = int(float(val) * (10**(-1 * int(last_point.__getattr__(point.sf).value))))
-    #     # print(int(float(val) * (10**(-1 * int(last_point.__getattr__(point.sf).value)))), (10**(-1 * int(last_point.__getattr__(point.sf).value))))
-    # print(val, type(val))
-    # print(point.value, type(point.value))
-    # print(dir(val), val.from_bytes())
+    if point.sf_required:
+        val = point.info.to_type(float(val) * (10**(-1 * int(last_point.__getattr__(point.sf).value))))
     point.set_value(val)
-    # point.set_value(0)
-    # print(point.value, type(point.value))
     # ce if sert a gérer les writes impossible dans les curve (à fix plus tard)
     if "write" in dir(point):
         try:
