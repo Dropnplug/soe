@@ -1,7 +1,7 @@
 function createTab() {
     let tableau = document.getElementsByClassName("tab")[0]
     let models = JSON.parse(this.response)
-    // console.log(models)
+    console.log(models)
     buildTab(tableau, models)
 }
 
@@ -27,7 +27,6 @@ function buildTab(elemParent, models, chemin=[]) {
                 let div = document.createElement("div")
                 let summary = document.createElement("summary")
                 summary.innerHTML = i
-                // elemEnfant.classList.add("group", "point")
                 div.classList.add("group", "point")
                 div.appendChild(elemEnfant)
                 elemEnfant.appendChild(summary)
@@ -53,16 +52,34 @@ function buildTab(elemParent, models, chemin=[]) {
                 divKey.innerHTML = key
                 elem.appendChild(divKey)
                 if (checkObjectKeys(["label"], value)){
-                    elem.innerHTML += " (" + value["label"] + ") : "
-                } else {
-                    elem.innerHTML += " : "
+                    elem.innerHTML += " (" + value["label"] + ")"
                 }
+                if (value["mandatory"] != null){
+                    let etoile = document.createElement("span")
+                    etoile.innerHTML = "*"
+                    etoile.style.color = "red"
+                    elem.appendChild(etoile)
+                }
+                if (value["units"] != null){
+                    let unit = document.createElement("span")
+                    unit.innerHTML = " " + value["units"]
+                    unit.style.color = "grey"
+                    elem.appendChild(unit)
+                }
+                elem.innerHTML += " : "
+                let valeurInput = false
                 if (checkObjectKeys(["access"], value)){
                     if (value["access"] == "RW"){
+                        valeurInput = true
                         let submit = document.createElement("button")
                         
                         if (value["type"].startsWith("enum") == true || value["type"].startsWith("bit") == true && value["symbols"] != null){
                             var input = document.createElement("select")
+                            if (value["is_impl"] == false){
+                                let optionELem = document.createElement("option")
+                                optionELem.innerHTML = "Non implémenté"
+                                input.appendChild(optionELem)
+                            }
                             for (opt of value["symbols"]){
                                 let optionELem = document.createElement("option")
                                 if (opt["value"] == value["value"]){
@@ -87,27 +104,37 @@ function buildTab(elemParent, models, chemin=[]) {
 
                         input.setAttribute("value", value["value"])
                         input.classList.add("value")
-                        if (value["value"] == null){
+                        if (value["is_impl"] == false){
                             input.setAttribute("disabled", "disabled")
                             submit.setAttribute("disabled", "disabled")
-                            if (value["mandatory"] != null){
-                                input.style.backgroundColor = "pink"
-                                console.log(value)
-                            }
                         }
 
                         elem.appendChild(input)
                         elem.appendChild(submit)
                     } else {
-                        let valeur = document.createElement("span")
-                        valeur.classList.add("value")
-                        valeur.innerText = value["value"] 
-                        elem.appendChild(valeur)
+                        valeurInput = false
                     }
                 } else {
+                    valeurInput = false
+                }
+
+                if (!valeurInput) {
                     let valeur = document.createElement("span")
                     valeur.classList.add("value")
-                    valeur.innerText = value["value"] 
+                    if (value["is_impl"]){
+                        if ((value["type"].startsWith("enum") == true || value["type"].startsWith("bit") == true) && value["symbols"] != null){
+                            for (opt of value["symbols"]){
+                                if (opt["value"] == value["value"]){
+                                    valeur.innerText = opt["name"]
+                                }
+                            }
+                        } else {
+                            valeur.innerText = value["value"] 
+                        }
+                    } else {
+                        valeur.innerText = "Non implémenté"
+                        valeur.style.opacity = 0.5
+                    }
                     elem.appendChild(valeur)
                 }
 

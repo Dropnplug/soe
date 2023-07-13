@@ -16,7 +16,7 @@ def formatDicoDocu(dict):
     return res
 
 # fonction pour joindre le dico d'un model fourni par l'onduleur et le dico formater de la documentation
-def mergeDico(dicoDocu, dicoOnduleur):
+def mergeDico(dicoDocu, dicoOnduleur, pointOrigin):
     if not type(dicoDocu) == type(dicoOnduleur):
         return
     
@@ -29,20 +29,20 @@ def mergeDico(dicoDocu, dicoOnduleur):
                 try:
                     # if key == "module":
                     #     key = "curve"
-                    res[key] = mergeDico(dicoDocu[key], value)
-                except:
-                    print(key)
+                    res[key] = mergeDico(dicoDocu[key], value, pointOrigin.__getattr__(key))
+                except Exception as e:
+                    print(e)
             else:
-                # if "mandatory" in dicoDocu[key]:
                 res[key] = dicoDocu[key]
                 res[key]["value"] = value
+                res[key]["is_impl"] = pointOrigin.__getattr__(key).is_impl()
         return res
 
     if type(dicoOnduleur) == list:
         res = []
         for indGroup, group in enumerate(dicoOnduleur):
             if type(group) in [list, dict]:
-                res.append(mergeDico(dicoDocu[indGroup], group))
+                res.append(mergeDico(dicoDocu[indGroup], group, pointOrigin[indGroup]))
             else:
                 tmp = dicoDocu[indGroup]
                 tmp["value"] = group
@@ -56,13 +56,15 @@ def getModel(dicoOrigin, numModel):
     # /!\ changer chemin pour que l'import marche de nimport ou
     with open(f"./sunData/models/json/model_{numModel}.json") as jsonFile:
         dicoModel = json.load(jsonFile)
+    pointOrigin = dicoOrigin
     dicoOrigin = dicoOrigin.get_dict(computed=True)
     dicoDocu = formatDicoDocu(dicoModel["group"])
-    return mergeDico(dicoDocu, dicoOrigin)
+    return mergeDico(dicoDocu, dicoOrigin, pointOrigin)
 
 # fonction pour récupérer tous les models d'un onduleur sous forme de dico mergé et placé dans une liste
 def getModels():
-    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=0, ipaddr='192.168.0.50', ipport=6607)
+    # onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=0, ipaddr='192.168.0.50', ipport=6607)
+    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=126, ipaddr='192.168.0.55', ipport=502)
     onduleur.scan()
     models = sortModels(onduleur)
     for key, value in models.items():
