@@ -1,2 +1,2 @@
-from .get import getModels
+from .get import getModels, getOnduleurs
 from .set import setPoint

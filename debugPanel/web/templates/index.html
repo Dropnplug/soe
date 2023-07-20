@@ -2,14 +2,28 @@
 {% block head %}
     <link rel="stylesheet" href="/static/css/index.css">
     <script type="text/javascript" src="/static/js/index.js"></script>
-    <title>Panneau de configuration</title>
+    <title>Accueil</title>
 {% endblock %}
 
 {% block body %}
-    <div id="notif">truc</div>
-    <h1>Panneau de configuration</h1>
-    <div class="infoDevice"></div>
-    <hr>
-    <div class="tab"></div>
-    <i style="padding-left: 0.5em; opacity: 0.8;"><span style="color: red;">*</span> : valeur obligatoire selon la norme Sunspec.</i>
+    <h1>Liste des onduleurs</h1>
+    <div>
+        <form class="formOnduleur">
+            <label for="ip">IP : </label>
+            <input onkeyup="checkForm()" name="ip" type="text">
+            <label for="port">Port : </label>
+            <input onkeyup="checkForm()" name="port" type="number">
+            <label for="slave_id">Slave ID : </label>
+            <input onkeyup="checkForm()" name="slave_id" type="number">
+            <button id="submit" disabled="disabled" type="submit">Aller à l'onduleur</button>
+        </form>
+        <p>
+            <button onclick="requestOnduleur('poubelle', refresh=true)">Rafraichir la liste</button>
+        </p>
+    </div>
+    <script>
+        let formOnduleur = document.getElementsByClassName("formOnduleur")[0]
+        formOnduleur.addEventListener("submit", formSubmit)
+    </script>
+    <div class="listeOnduleurs"></div>
 {% endblock %}

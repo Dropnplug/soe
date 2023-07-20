@@ -1,9 +1,9 @@
 import sunspec2.modbus.client as client
 import traceback
 
-def setPoint(pointRoute, val):
-    # onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=0, ipaddr='192.168.0.50', ipport=6607)
-    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=126, ipaddr='192.168.0.55', ipport=502)
+def setPoint(pointRoute, val, ip, port, slave_id):
+    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=slave_id, ipaddr=ip, ipport=port)
+    # onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=126, ipaddr='192.168.0.55', ipport=502)
     onduleur.scan()
     model = onduleur.models.get(int(pointRoute.pop(0)))[0]
     point = model

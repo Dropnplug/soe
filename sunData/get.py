@@ -1,5 +1,6 @@
 import sunspec2.modbus.client as client
 import json
+from .discover import *
 
 # fonction pour mettre le dictionnaire d'un model de la documentation au même format que ceux fourni par l'onduleur
 def formatDicoDocu(dict):
@@ -62,9 +63,9 @@ def getModel(dicoOrigin, numModel):
     return mergeDico(dicoDocu, dicoOrigin, pointOrigin)
 
 # fonction pour récupérer tous les models d'un onduleur sous forme de dico mergé et placé dans une liste
-def getModels():
-    # onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=0, ipaddr='192.168.0.50', ipport=6607)
-    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=126, ipaddr='192.168.0.55', ipport=502)
+def getModels(ip, port, slave_id):
+    onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=slave_id, ipaddr=ip, ipport=port)
+    # onduleur = client.SunSpecModbusClientDeviceTCP(slave_id=126, ipaddr='192.168.0.55', ipport=502)
     onduleur.scan()
     models = sortModels(onduleur)
     for key, value in models.items():
@@ -86,3 +87,10 @@ def sortModels(onduleur: client.SunSpecModbusClientDeviceTCP):
             res[value]["Name"] = key
     
     return res
+
+def getOnduleurs(refresh=False):
+    # cheminFichier = "sunData/cache/discovered.mem"
+    cheminFichier = discover("sunData", refresh)
+    with open(cheminFichier, "r") as f:
+        data = json.load(f)
+    return data
