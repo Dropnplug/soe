@@ -9,5 +9,5 @@ slave_id = 0
 # slave_id = 0
 
 # remplir les ip des ondueleurs (les ip doivent être fixes)
-listIpAddr = ["192.168.0.50", "192.168.0.51", "192.168.0.53"]
+listIpAddr = ["192.168.200.1"]
 portStandards = [502, 8502, 6607]
