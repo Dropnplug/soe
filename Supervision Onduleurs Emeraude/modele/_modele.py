@@ -1,6 +1,9 @@
 class Modele():
     def __init__(self) -> None:
         print("modele init")
+
+    def getNom(self):  # Nom de l'onduleur
+        return None
         
     def getPdc(self):  # Puissance DC onduleur
         return None

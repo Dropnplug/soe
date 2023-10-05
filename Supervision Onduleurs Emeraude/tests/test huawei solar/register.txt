@@ -1,0 +1,82 @@
+REGISTERS: dict[str, RegisterDefinition] = {
+    rn.MODEL_NAME: StringRegister(30000, 15),
+    rn.SERIAL_NUMBER: StringRegister(30015, 10),
+    rn.PN: StringRegister(30025, 10),
+    rn.MODEL_ID: U16Register(None, 1, 30070, 1),
+    rn.NB_PV_STRINGS: U16Register(None, 1, 30071, 1),
+    rn.NB_MPP_TRACKS: U16Register(None, 1, 30072, 1),
+    rn.RATED_POWER: U32Register("W", 1, 30073, 2),
+    rn.P_MAX: U32Register("W", 1, 30075, 2),
+    rn.S_MAX: U32Register("VA", 1, 30077, 2),
+    rn.Q_MAX_OUT: I32Register("VAr", 1, 30079, 2),
+    rn.Q_MAX_IN: I32Register("VAr", 1, 30081, 2),
+    rn.OFFERING_NAME_OF_SOUTHBOUND_DEVICE_1: StringRegister(30561, 15),
+    rn.OFFERING_NAME_OF_SOUTHBOUND_DEVICE_2: StringRegister(30576, 15),
+    rn.OFFERING_NAME_OF_SOUTHBOUND_DEVICE_3: StringRegister(30591, 15),
+    rn.HARDWARE_VERSION: StringRegister(31000, 15),
+    rn.MONITORING_BOARD_SN: StringRegister(31015, 10),
+    rn.MONITORING_SOFTWARE_VERSION: StringRegister(31025, 15),
+    rn.MASTER_DSP_VERSION: StringRegister(31040, 15),
+    rn.CPLD_VERSION: StringRegister(31070, 15),
+    rn.AFCI_VERSION: StringRegister(31085, 15),
+    rn.DC_MBUS_VERSION: StringRegister(31115, 15),
+    rn.REGKEY: StringRegister(31200, 10),
+    rn.STATE_1: U16Register(partial(bitfield_decoder, rv.STATE_CODES_1), 1, 32000, 1),
+    rn.STATE_2: U16Register(partial(bitfield_decoder, rv.STATE_CODES_2), 1, 32002, 1),
+    rn.STATE_3: U32Register(partial(bitfield_decoder, rv.STATE_CODES_3), 1, 32003, 2),
+    rn.ALARM_1: U16Register(partial(bitfield_decoder, rv.ALARM_CODES_1), 1, 32008, 1, ignore_invalid=True),
+    rn.ALARM_2: U16Register(partial(bitfield_decoder, rv.ALARM_CODES_2), 1, 32009, 1, ignore_invalid=True),
+    rn.ALARM_3: U16Register(partial(bitfield_decoder, rv.ALARM_CODES_3), 1, 32010, 1),
+    rn.INPUT_POWER: I32Register("W", 1, 32064, 2),
+    rn.GRID_VOLTAGE: U16Register("V", 10, 32066, 1),
+    rn.LINE_VOLTAGE_A_B: U16Register("V", 10, 32066, 1),
+    rn.LINE_VOLTAGE_B_C: U16Register("V", 10, 32067, 1),
+    rn.LINE_VOLTAGE_C_A: U16Register("V", 10, 32068, 1),
+    rn.PHASE_A_VOLTAGE: U16Register("V", 10, 32069, 1),
+    rn.PHASE_B_VOLTAGE: U16Register("V", 10, 32070, 1),
+    rn.PHASE_C_VOLTAGE: U16Register("V", 10, 32071, 1),
+    rn.GRID_CURRENT: I32Register("A", 1000, 32072, 2),
+    rn.PHASE_A_CURRENT: I32Register("A", 1000, 32072, 2),
+    rn.PHASE_B_CURRENT: I32Register("A", 1000, 32074, 2),
+    rn.PHASE_C_CURRENT: I32Register("A", 1000, 32076, 2),
+    rn.DAY_ACTIVE_POWER_PEAK: I32Register("W", 1, 32078, 2),
+    rn.ACTIVE_POWER: I32Register("W", 1, 32080, 2),
+    rn.REACTIVE_POWER: I32Register("VA", 1, 32082, 2),
+    rn.POWER_FACTOR: I16Register(None, 1000, 32084, 1),
+    rn.GRID_FREQUENCY: U16Register("Hz", 100, 32085, 1),
+    rn.EFFICIENCY: U16Register("%", 100, 32086, 1),
+    rn.INTERNAL_TEMPERATURE: I16Register("°C", 10, 32087, 1),
+    rn.INSULATION_RESISTANCE: U16Register("MOhm", 100, 32088, 1),
+    rn.DEVICE_STATUS: U16Register(rv.DEVICE_STATUS_DEFINITIONS, 1, 32089, 1),
+    rn.FAULT_CODE: U16Register(None, 1, 32090, 1),
+    rn.STARTUP_TIME: TimestampRegister(32091, 2),
+    rn.SHUTDOWN_TIME: TimestampRegister(32093, 2),
+    rn.ACCUMULATED_YIELD_ENERGY: U32Register("kWh", 100, 32106, 2),
+    rn.DAILY_YIELD_ENERGY: U32Register("kWh", 100, 32114, 2),
+    rn.CAPBANK_RUNNING_TIME: U32Register("hour", 10, 35000, 2),  # SUN2000MA-only register
+    rn.INTERNAL_FAN_1_RUNNING_TIME: U32Register("hour", 10, 35002, 2),  # SUN2000MA-only register
+    rn.INV_MODULE_A_TEMP: I16Register("°C", 10, 35021, 1),  # SUN2000MA-only register
+    rn.INV_MODULE_B_TEMP: I16Register("°C", 10, 35022, 1),  # SUN2000MA-only register
+    rn.INV_MODULE_C_TEMP: I16Register("°C", 10, 35023, 1),  # SUN2000MA-only register
+    rn.ANTI_REVERSE_MODULE_1_TEMP: I16Register("°C", 10, 35024, 1),  # SUN2000MA-only register
+    rn.OUTPUT_BOARD_RELAY_AMBIENT_TEMP_MAX: I16Register("°C", 10, 35025, 1),  # SUN2000MA-only register
+    rn.ANTI_REVERSE_MODULE_2_TEMP: I16Register("°C", 10, 35027, 1),  # SUN2000MA-only register
+    rn.DC_TERMINAL_1_2_MAX_TEMP: I16Register("°C", 10, 35028, 1),  # SUN2000MA-only register
+    rn.AC_TERMINAL_1_2_3_MAX_TEMP: I16Register("°C", 10, 35029, 1),  # SUN2000MA-only register
+    rn.PHASE_A_DC_COMPONENT_DCI: I16Register("A", 1000, 35038, 1),  # SUN2000MA-only register
+    rn.PHASE_B_DC_COMPONENT_DCI: I16Register("A", 1000, 35039, 1),  # SUN2000MA-only register
+    rn.PHASE_C_DC_COMPONENT_DCI: I16Register("A", 1000, 35040, 1),  # SUN2000MA-only register
+    rn.LEAKAGE_CURRENT_RCD: I16Register("mA", 1, 35041, 1),  # SUN2000MA-only register
+    rn.POSITIVE_BUS_VOLTAGE: I16Register("V", 10, 35042, 1),  # SUN2000MA-only register
+    rn.NEGATIVE_BUS_VOLTAGE: I16Register("V", 10, 35043, 1),  # SUN2000MA-only register
+    rn.BUS_NEGATIVE_VOLTAGE_TO_GROUND: I16Register("V", 10, 35044, 1),  # SUN2000MA-only register
+    rn.NB_OPTIMIZERS: U16Register(None, 1, 37200, 1),
+    rn.NB_ONLINE_OPTIMIZERS: U16Register(None, 1, 37201, 1),
+    rn.SYSTEM_TIME: TimestampRegister(40000, 2),
+    rn.SYSTEM_TIME_RAW: U32Register("seconds", 1, 40000, 2),
+    rn.STARTUP: U16Register(None, 1, 40200, 1, writeable=True, readable=False),
+    rn.SHUTDOWN: U16Register(None, 1, 40201, 1, writeable=True, readable=False),
+    rn.GRID_CODE: U16Register(rv.GRID_CODES, 1, 42000, 1),
+    rn.TIME_ZONE: I16Register("min", 1, 43006, 1, writeable=True),
+    rn.WLAN_WAKEUP: I16Register(rv.WlanWakeup, 1, 45052, 1, writeable=True),
+}
