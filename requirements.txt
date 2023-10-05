@@ -1,0 +1,4 @@
+huawie_solar
+pysunspec2
+serial
+pymodbus
