@@ -47,7 +47,7 @@ class Modele():
     def getFacPP(self):  # Fréquence AC onduleur par phase
         return None
     
-    def getfactLimP(self):  # Facteur de limitation dee la puissance de l'ondueleur
+    def getfactLimP(self):  # Facteur de limitation de la puissance de l'ondueleur
         return None
     
     def getDCosPhi(self):  # Déphasage Cos phi ou Tan phi
