@@ -45,9 +45,10 @@ class Modele():
         return None
     
     def getFacPP(self):  # Fréquence AC onduleur par phase
-        return None
+        fac = self.getFac()
+        return [fac, fac, fac]
     
-    def getfactLimP(self):  # Facteur de limitation de la puissance de l'ondueleur
+    def getFactLimP(self):  # Facteur de limitation de la puissance de l'ondueleur
         return None
     
     def getDCosPhi(self):  # Déphasage Cos phi ou Tan phi
@@ -62,10 +63,7 @@ class Modele():
     def getDefaut(self):  # Defauts de l'onduleurs (alarmes)
         return None
     
-    def getIdDefaut(self):  # Numéro du defaut (de l'alarme)
-        return None
-    
-    def setLimP(self):  # Modification de la limitation de la puissance
+    def setFactLimP(self):  # Modification de la limitation de la puissance
         return None
     
     def setPI(self):  # Modification de la puissance instantanée
