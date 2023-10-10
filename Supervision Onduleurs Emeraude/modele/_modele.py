@@ -69,7 +69,7 @@ class Modele():
     def setPI(self):  # Modification de la puissance instantanée
         return None
     
-    def setFactP(self):  # Modification du facteur de puissance
+    def setDCosPhi(self):  # Modification du facteur de puissance (cos phi)
         return None
     
     def setDefaut(self):  # Lecture des defauts (pas sur que ça soit un setter)
