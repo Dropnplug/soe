@@ -1,0 +1,10 @@
+{
+    "defaut":{
+        "nom":[
+            ["common", "Md"]
+        ],
+        "Puissance DC":[
+            ["inverter", ""]
+        ]
+    }
+}

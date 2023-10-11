@@ -1,23 +1,11 @@
 import sunspec2.modbus.client as client
+import json
+import traceback
 
 if __name__ == '__main__':
     from _modele import Modele
 else:
     from ._modele import Modele
-
-def sortModels(client):
-    dicoModels = client.models
-    res = {}
-    for key, value in dicoModels.items():
-        value = value[0]
-        if value not in res.keys():
-            res[value] = {}
-        if type(key) == int:
-            res[value]["ID"] = key
-        else:
-            res[value]["Name"] = key
-    
-    return res
 
 class OnduleurSunspec(Modele):
     def __init__(self, ip, port, slaveId:int=0):
@@ -25,18 +13,61 @@ class OnduleurSunspec(Modele):
         self.client =client.SunSpecModbusClientDeviceTCP(slave_id=slaveId, ipaddr=ip, ipport=port)
         self.client.connect()
 
-    def _getModels(self):
-        self.client.scan()
-        return sortModels(self.client) 
+        # on get le nom (modele) de l'onduleur et si il est dans le fichier json on affecte ses chemins dans self.chemins
+        with open("data/sunspec.json", "r") as f:
+            cheminsJson = json.load(f)
+        self.nom = self.getNom()
+        if self.nom in cheminsJson.keys():
+            print("Onduleur déjà découvert")
+            self.chemins = cheminsJson[self.nom]
+        # si non on initialise le modele dans le json et on lance une décvouerte des chemins
+        else:
+            print("Onduleur jamais découvert")
+            with open("data/sunspec.json", "w") as f:
+                cheminsJson[self.nom] = {}
+                json.dump(cheminsJson, f)
+            self.chemins = {}
+            self.decouvreChemins()
 
-    def _get(self):
-        return None
+    # executer la fonction dans un thread
+    def decouvreChemins(self):
+        # parcours tous les points du modele defaut et essaie chaque chemin pour initialiser les chemins de ce modele d'ondueleur dans le json et self.chemins
+        with open("data/sunspec.json", "r") as f:
+            cheminsJson = json.load(f)
+        cheminsDefaut = cheminsJson["defaut"]
+        for point in cheminsDefaut.keys():
+            i = 0
+            trouve = False
+            while i < len(cheminsDefaut[point]) and not trouve:
+                chemin = cheminsDefaut[point][i]
+                cheminTmp = chemin.copy()
+                print("essaie chemin :", chemin)
+                i = i + 1
+                try:
+                    if self._get(cheminTmp):
+                        cheminsJson[self.nom][point] = chemin
+                        trouve = True
+                        with open("data/sunspec.json", "w") as f:
+                            json.dump(cheminsJson, f)
+                except Exception as e:
+                    print("erreur :", e)
+
+    def _get(self, chemin):
+        self.client.scan()
+        # résolution du chemin pour l'accès au point
+        point = self.client.models.get(chemin.pop(0))[0]
+        for elem in chemin:
+            if not elem.isdigit():
+                point = point.__getattr__(elem)
+            else:
+                point = point[int(elem)]
+        return point.value
 
     def getNom(self):  # Nom de l'onduleur
-        return None
+        return self.client.models["common"][0].__getattr__("Md").value
         
     def getPdc(self):  # Puissance DC onduleur
-        return None
+        return self._get(self.chemins["Puissance DC"])
     
     def getPdcMppt(self):  # Puissance DC MPPT
         return None
@@ -110,7 +141,3 @@ class OnduleurSunspec(Modele):
 
 if __name__ == '__main__':
     onduleur = OnduleurSunspec("192.168.200.1", 6607)
-    # print(onduleur._getModels())
-    onduleur.client.scan()
-    print(dir(onduleur.client.models["common"][0]))
-    # print(onduleur.client.get_json(computed=True))
