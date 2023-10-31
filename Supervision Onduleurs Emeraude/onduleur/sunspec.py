@@ -12,14 +12,15 @@ class OnduleurSunspec(Modele):
         super().__init__()
         self.client =client.SunSpecModbusClientDeviceTCP(slave_id=slaveId, ipaddr=ip, ipport=port)
         self.client.connect()
+        self.client.scan()
+        self.nom = self.getNom()
+        self.chemins = {}
 
         # on get le nom (modele) de l'onduleur et si il est dans le fichier json on affecte ses chemins dans self.chemins
         with open("data/sunspec.json", "r") as f:
             cheminsJson = json.load(f)
-        self.client.scan()
-        self.nom = self.getNom()
         if self.nom in cheminsJson.keys():
-            print("Onduleur déjà découvert")
+            print("Onduleur déjà découvert :", self.nom)
             self.chemins = cheminsJson[self.nom]
         # si non on initialise le modele dans le json et on lance une décvouerte des chemins
         else:
@@ -27,12 +28,11 @@ class OnduleurSunspec(Modele):
             with open("data/sunspec.json", "w") as f:
                 cheminsJson[self.nom] = {}
                 json.dump(cheminsJson, f)
-            self.chemins = {}
             self.decouvreChemins()
 
     # il faudra executer la fonction dans un thread
     def decouvreChemins(self):
-        # parcours tous les points du modele defaut et essaie chaque chemin pour initialiser les chemins de ce modele d'ondueleur dans le json et self.chemins
+        # parcours tous les points du modele defaut et essaie chaque chemin pour initialiser les chemins de ce modele d'onduleur dans le json et self.chemins
         with open("data/sunspec.json", "r") as f:
             cheminsJson = json.load(f)
         cheminsDefaut = cheminsJson["defaut"]
@@ -41,22 +41,31 @@ class OnduleurSunspec(Modele):
             trouve = False
             while i < len(cheminsDefaut[point]) and not trouve:
                 chemin = cheminsDefaut[point][i]
+                nomPoint = point
                 cheminTmp = chemin.copy()
                 print("essaie chemin :", chemin)
                 i = i + 1
                 try:
-                    if self._get(cheminTmp) != None:
+                    if self._get(nomPoint, cheminListe=cheminTmp) != None:
                         cheminsJson[self.nom][point] = chemin
                         trouve = True
+                        self.chemins[point] = chemin
                         with open("data/sunspec.json", "w") as f:
                             json.dump(cheminsJson, f)
+                        print("ok")
+                    else:
+                        print("pas de valeur pour ce chemin")
                 except Exception as e:
                     print("erreur :", e)
 
-    def _get(self, nomChemin):
-        if nomChemin not in self.chemins.keys():
+    def _get(self, nomChemin, cheminListe:list=None):
+        if (not cheminListe) and (nomChemin not in self.chemins.keys()):
+            print(nomChemin)
             return None
-        chemin = self.chemins[nomChemin]
+        if not cheminListe:
+            chemin = self.chemins[nomChemin]
+        else:
+            chemin = cheminListe
         cheminTmp = chemin.copy()
         self.client.scan()
         # résolution du chemin pour l'accès au point
@@ -99,13 +108,13 @@ class OnduleurSunspec(Modele):
         return max(self.getTacPP())
     
     def getTacPP(self):  # Tension AC onduleur par phase
-        return [self._get("Tension AC phase A"), self._get("Tension AC phase B"), self._get("Tension AC phase C")]
+        return [self._get("Tension AC phase A") * 1.0, self._get("Tension AC phase B") * 1.0, self._get("Tension AC phase C") * 1.0]
     
     def getCac(self):  # Courrant AC onduleur
-        return self._get("Courant AC")
+        return self._get("Courant AC") * 1.0
     
     def getCacPP(self):  # Courrant AC onduleur par phase
-        return [self._get("Courant AC phase A"), self._get("Courant AC phase B"), self._get("Courant AC phase C")]
+        return [self._get("Courant AC phase A") * 1.0, self._get("Courant AC phase B") * 1.0, self._get("Courant AC phase C") * 1.0]
     
     def getFac(self):  # Fréquence AC onduleur
         return self._get("Frequence") * 0.01
@@ -115,17 +124,17 @@ class OnduleurSunspec(Modele):
         fac = self.getFac()
         return [fac, fac, fac]
     
-    def getFactLimP(self):  # Facteur de limitation de la puissance de l'ondueleur
+    def getFactLimP(self):  # Facteur de limitation de la puissance de l'onduleur
         return None
     
     def getDCosPhi(self):  # Déphasage Cos phi ou Tan phi
-        return None
+        return self._get("Dephasage Cos phi") * 0.01
     
     def getTemp(self):  # Température de l'onduleur
-        return None
+        return self._get("Temperature") * 0.1
     
     def getPreac(self):  # Puissance réactive onduleur
-        return None
+        return self._get("Puissance reactive") * 0.1
     
     def getDefaut(self):  # Defauts de l'onduleurs (alarmes)
         return None
@@ -137,6 +146,7 @@ class OnduleurSunspec(Modele):
         return None
     
     def setDCosPhi(self):  # Modification du facteur de puissance (cos phi)
+        # point à set OutPFSet_SF
         return None
     
     def setDefaut(self):  # Lecture des defauts (pas sur que ça soit un setter)
@@ -149,4 +159,6 @@ if __name__ == '__main__':
     onduleur = OnduleurSunspec("192.168.200.1", 6607)
     for func in dir(onduleur):
         if func.startswith("get"):
-            print(func, onduleur.__getattribute__(func)())
+            print(func, "\t\t", onduleur.__getattribute__(func)())
+
+    print(onduleur.chemins)

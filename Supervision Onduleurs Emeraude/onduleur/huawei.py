@@ -583,7 +583,7 @@ class OnduleurHuawei(Modele):
         return courantDC
     
     def getPac(self):  # Puissance AC onduleur
-        return self._get("Puissance AC")
+        return self._get("Puissance AC") * 1.0
     
     def getPacPP(self):  # Puissance AC onduleur par phase
         # approximation mais bonne quand même

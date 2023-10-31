@@ -1,6 +1,7 @@
+# fonctions demandées par le cahier des charges
 class Modele():
     def __init__(self) -> None:
-        print("modele init")
+        print("Initialisation d'un onduleur")
 
     def getNom(self):  # Nom de l'onduleur
         return None
@@ -48,7 +49,7 @@ class Modele():
         fac = self.getFac()
         return [fac, fac, fac]
     
-    def getFactLimP(self):  # Facteur de limitation de la puissance de l'ondueleur
+    def getFactLimP(self):  # Facteur de limitation de la puissance de l'onduleur
         return None
     
     def getDCosPhi(self):  # Déphasage Cos phi ou Tan phi
