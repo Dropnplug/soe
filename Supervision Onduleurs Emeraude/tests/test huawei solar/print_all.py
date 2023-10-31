@@ -221,13 +221,14 @@ DECODEUR = {
     5:decode32Int
 }
 
-ip = "192.168.100.161"
+ip = "192.168.200.1"
 port = 6607
 slaveId = 0
 
 client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId))
-asyncio.get_event_loop().run_until_complete(client.login("installer", "Emeraude7850"))
+# asyncio.get_event_loop().run_until_complete(client.login("installer", "0000a"))
 last_reg_id = None
+print("ici")
 
 for register in REGISTERS:
     if last_reg_id is not None:

@@ -1,4 +1,4 @@
-huawie_solar
+huawei_solar
 pysunspec2
 serial
 pymodbus

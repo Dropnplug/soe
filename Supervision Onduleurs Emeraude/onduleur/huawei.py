@@ -5,9 +5,9 @@ import asyncio
 import time
 
 if __name__ == '__main__':
-    from _modele import Modele
+    from _onduleur import Modele
 else:
-    from ._modele import Modele
+    from ._onduleur import Modele
 
 
 
@@ -573,13 +573,13 @@ class OnduleurHuawei(Modele):
     def getTdc(self):  # Tension DC onduleur
         tensionDC = {}
         for numPv in range(self.nbPvMax):
-            tensionDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Tension") * 0.01
+            tensionDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Tension") * 0.1
         return tensionDC
     
     def getCdc(self):  # Courant DC onduleur
         courantDC = {}
         for numPv in range(self.nbPvMax):
-            courantDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Courant")
+            courantDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Courant") * 0.01
         return courantDC
     
     def getPac(self):  # Puissance AC onduleur
@@ -652,12 +652,17 @@ class OnduleurHuawei(Modele):
     
 
 if __name__ == '__main__':
-    onduleur = OnduleurHuawei("192.168.100.161", 6607, utilisateur="installer", mdp="Emeraude7850")
+    onduleur = OnduleurHuawei("192.168.200.1", 6607, utilisateur="installer", mdp="Emeraude7850")
     for func in dir(onduleur):
         if func.startswith("get"):
             print(func, onduleur.__getattribute__(func)())
     
-    print("setLimP", onduleur.setLimP(3300), onduleur.getFactLimP() * (onduleur.pmax / 100))
-    print("setFactLimP", onduleur.setFactLimP(100), onduleur.getFactLimP())
-    print("setPI", onduleur.setPI(3300), onduleur.getFactLimP() * (onduleur.pmax / 100))
-    print("setCosPhi", onduleur.setDCosPhi(1), onduleur.getDCosPhi())
+    # les defaut faites pas les timides il faut venir
+    while True:
+        time.sleep(1)
+        print(onduleur.getDefaut())
+    
+    # print("setLimP", onduleur.setLimP(3300), onduleur.getFactLimP() * (onduleur.pmax / 100))
+    # print("setFactLimP", onduleur.setFactLimP(100), onduleur.getFactLimP())
+    # print("setPI", onduleur.setPI(3300), onduleur.getFactLimP() * (onduleur.pmax / 100))
+    # print("setCosPhi", onduleur.setDCosPhi(1), onduleur.getDCosPhi())

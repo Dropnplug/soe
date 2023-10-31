@@ -1,4 +1,4 @@
-from modele import OnduleurHuawei
+from onduleur import OnduleurHuawei
 
 if __name__ == '__main__':
     onduleur = OnduleurHuawei("192.168.100.161", 6607, utilisateur="installer", mdp="Emeraude7850")
