@@ -1,3 +1,5 @@
 flask
 uWSGI
 requests
+huawei_solar
+pysunspec2
