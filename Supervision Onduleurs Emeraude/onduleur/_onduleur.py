@@ -1,5 +1,5 @@
 # fonctions demandées par le cahier des charges
-class Modele():
+class Onduleur():
     def __init__(self) -> None:
         print("Initialisation d'un onduleur")
 

@@ -5,9 +5,9 @@ import asyncio
 import time
 
 if __name__ == '__main__':
-    from _onduleur import Modele
+    from _onduleur import Onduleur
 else:
-    from ._onduleur import Modele
+    from ._onduleur import Onduleur
 
 
 
@@ -488,7 +488,7 @@ STATE_CODES_3 = {
     0b0000_0000_0000_0000_0000_0000_0000_0010: ("Off-grid switch disabled", "Off-grid switch enabled"),
 }
 
-class OnduleurHuawei(Modele):
+class OnduleurHuawei(Onduleur):
     def __init__(self, ip, port, slaveId:int=0, utilisateur:str=None, mdp:str=None):
         super().__init__()
         self.utilisateur = utilisateur
@@ -652,7 +652,7 @@ class OnduleurHuawei(Modele):
     
 
 if __name__ == '__main__':
-    onduleur = OnduleurHuawei("192.168.200.1", 6607, utilisateur="installer", mdp="Emeraude7850")
+    onduleur = OnduleurHuawei("192.168.200.1", 6607, utilisateur="installer", mdp="Emeraude7850", slaveId=0)
     for func in dir(onduleur):
         if func.startswith("get"):
             print(func, onduleur.__getattribute__(func)())
