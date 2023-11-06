@@ -1,6 +1,3 @@
-selenium
-pyvirtualdisplay
-
 flask
 uWSGI
 requests
