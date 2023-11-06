@@ -1,0 +1,10 @@
+<link rel="stylesheet" href="/static/css/src/alert_box.css">
+<script type="text/javascript" src="/static/js/src/alert_box.js"></script>
+<div class="alert_box" id="alert_box">
+	{% for message in get_flashed_messages() %}
+		<div class="alert">
+			{{ message }}
+			<button onclick="closeAlert(this)">X</button>
+		</div>
+	{% endfor %}
+</div>

@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+<script type="text/javascript" src="/static/js/admin/memo.js"></script>
+<link rel="stylesheet" href="/static/css/admin/memo.css">
+<script type="text/javascript" src="/static/js/src/sort_table.js"></script>
+{% endblock %}
+{% block body %}
+<div style="display:flex; width: 100%;">
+<div style="width:15%;margin:5px;">
+	<h3>memo keys:</h3>
+	{{ memo_keys | safe }}
+</div>
+<div style="width:85%;margin:5px;">
+	<table>
+		<caption><h3>memo</h3></caption>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Content</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{ memo_values | safe }}
+		</tbody>
+	</table>
+	<br>
+	<div style="width:100%; display:none;" id="memo_fct">
+		<p id="memo_function">Function path:</p>
+		<label>*args [list]</label>
+		<code>
+			<p></p>
+			<div contenteditable="true" id="memo_args">[]</div>
+		</code>
+		<label>**kwargs {dict}</label>
+		<code>
+			<p></p>
+			<div contenteditable="true" id="memo_kwargs">{}</div>
+		</code>
+		<button id="memo_execute">Execute</button>
+	</div>
+	<div style="width:100%; display:none;" id="memo_res">
+		<code>
+			<p></p>
+			<div contenteditable="false" id="memo_result"><br></div>
+		</code>
+	</div>
+</div>
+</div>
+{% endblock %}
+
+<!-- https://codepen.io/cahil/pen/qYpbGL -->

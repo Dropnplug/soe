@@ -1,0 +1,23 @@
+code {
+	display: flex;
+	background-color: rgba(0, 0, 0, 0.1);
+	border: solid 1px rgba(0, 0, 0, 0.2);
+	width: auto;
+	min-height: 5em;
+	height: auto;
+	margin: 3px;
+	margin-bottom: 10px;
+}
+
+code p {
+	width: 50px;
+	margin: 0;
+	padding: 0;
+	margin-right: 10px;
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+code div {
+	width: 100%;
+	white-space: pre;
+}

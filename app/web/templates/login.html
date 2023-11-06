@@ -1,0 +1,17 @@
+{% extends "main.html" %}
+{% block title %}Login{% endblock %}
+{% block head %}
+	<script type="text/javascript" src="/static/js/src/sha256.js"></script>
+	<script type="text/javascript" src="/static/js/login.js"></script>
+{% endblock %}
+{% block body %}
+	<div style="margin-left: auto;margin-right: auto;margin-top: 20vh;">
+		<form name="login" id="login" onsubmit="prelogin();" action="/login" method="post">
+			<label>Email</label>
+			<input name="email" type="email" id="email">
+			<label>Mot de Passe</label>
+			<input name="password" type="password" id="password">
+			<button type="submit">Connexion</button>
+		</form>
+	</div>
+{% endblock %}

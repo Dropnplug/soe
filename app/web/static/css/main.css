@@ -1,0 +1,114 @@
+@import "var.css";
+@import "class.css";
+
+* , *:before, *:after {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+html {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	background-color: var(--sec-color);
+	overflow-x: hidden;
+}
+
+body {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	overflow-x: hidden;
+	font-family: "Avenir Next", "Avenir", sans-serif;
+	display : table;
+	color: var(--txt-color);
+}
+
+div {
+	margin: 0;
+	padding: 0;
+	width: fit-content;
+	height: fit-content;
+}
+
+a {
+	text-decoration: none;
+	color: var(--txt-color);
+}
+
+a:hover {
+	text-decoration: underline;
+	opacity: 75%;
+}
+
+h1, h2, h3, h4, h5, h6{
+	margin: 10px;
+	padding: 0;
+	width: 100%;
+	text-align: center;
+}
+
+input, select, button, option {
+	background-color: transparent;
+	background: var(--main-color);
+	border-radius: 5px;
+	margin: 5px;
+	margin-inline: auto;
+	padding: 5px;
+}
+
+input, select, option {
+	min-width: 300px;
+	display: block;
+	height: fit-content;
+}
+
+table {
+	border-collapse: collapse;
+	overflow: auto;
+	width: 100%;
+	margin: auto;
+	text-align: center;
+}
+
+th, td{
+	border-collapse: collapse;
+	border: solid 2px rgba(255, 255, 255, 0.05);
+	min-width: 50px;
+	padding: 5px;
+	padding:auto;
+	border-radius: 10px;
+}
+
+td button {
+	width: auto;
+	cursor: pointer;
+	margin: 2px;
+	color: var(--txt-color);
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+td button:hover {
+	text-decoration: underline;
+	opacity: 75%;
+}
+
+tbody tr:nth-child(odd) {
+	background-color:rgba(0, 0, 0, 0.1);
+}
+
+tbody tr:nth-child(even) {
+	background-color:rgba(0, 0, 0, 0.2);
+}
+
+th[onclick] {
+	cursor: pointer;
+}
+
+th[onclick]:hover {
+	text-decoration: underline;
+	opacity: 75%;
+}
