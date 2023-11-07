@@ -1,0 +1,29 @@
+{% extends "/mods/sunspec_debug_panel/main.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/mods/sunspec_debug_panel/css/index.css">
+    <script type="text/javascript" src="/static/mods/sunspec_debug_panel/js/index.js"></script>
+    <title>Accueil</title>
+{% endblock %}
+
+{% block body %}
+    <h1>Liste des onduleurs</h1>
+    <div>
+        <form class="formOnduleur">
+            <label for="ip">IP : </label>
+            <input onkeyup="checkForm()" name="ip" type="text">
+            <label for="port">Port : </label>
+            <input onkeyup="checkForm()" name="port" type="number">
+            <label for="slave_id">Slave ID : </label>
+            <input onkeyup="checkForm()" name="slave_id" type="number">
+            <button id="submit" disabled="disabled" type="submit">Aller à l'onduleur</button>
+        </form>
+        <p>
+            <button onclick="requestOnduleur('poubelle', refresh=true)">Rafraichir la liste</button>
+        </p>
+    </div>
+    <script>
+        let formOnduleur = document.getElementsByClassName("formOnduleur")[0]
+        formOnduleur.addEventListener("submit", formSubmit)
+    </script>
+    <div class="listeOnduleurs"></div>
+{% endblock %}

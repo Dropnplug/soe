@@ -1,0 +1,24 @@
+{% extends "/mods/sunspec_debug_panel/main.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/mods/sunspec_debug_panel/css/onduleur.css">
+    <script type="text/javascript" src="/static/mods/sunspec_debug_panel/js/onduleur.js"></script>
+    <title>Panneau de configuration</title>
+{% endblock %}
+
+{% block body %}
+    <script>
+        var port = {{ port }};
+        var ip = "{{ ip }}";
+        var slave_id = {{ slave_id }};
+    </script>
+    <div>
+        <h1>Panneau de configuration</h1>
+        <button onclick="window.location.href='/';">Retour</button>
+    </div>
+    <div class="infoDevice"></div>
+    <hr>
+    <div class="tab"></div>
+    <i style="padding-left: 0.5em; opacity: 0.8;"><span style="color: red;">*</span> : valeur obligatoire selon la norme Sunspec.</i>
+    <br>
+    <i style="padding-left: 0.5em; opacity: 0.8;"><span>Non implémenté ou grisé</span> : valeur non accessible.</i>
+{% endblock %}
