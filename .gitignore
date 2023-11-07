@@ -134,3 +134,4 @@ app/web/routes/mods/
 app/web/static/mods/
 app/web/templates/mods/
 app/data/db/live.db
+app/data/logs/logs.txt
