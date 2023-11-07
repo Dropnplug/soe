@@ -37,10 +37,13 @@ class Onduleurs(multiprocessing.Process):
         self._init()
         while self.on:
             start_time = time.time()
-            to_do = memo["onduleurs_data"].get_requests()
-            for key, value in to_do.items():
-                ret = getattr(self._onduleurs, value["attr"])(*value["args"], **value["kwargs"])
-                memo["onduleurs_data"].set_response(key, ret)
+            try:
+                to_do = memo["onduleurs_data"].get_requests()
+                for key, value in sorted(to_do.items()):
+                    ret = getattr(self._onduleurs, value["attr"])(*value["args"], **value["kwargs"])
+                    memo["onduleurs_data"].set_response(key, ret)
+            except:
+                pass # log ?
             time.sleep(max(config.SLEEP - (time.time() - start_time), 0))
         time.sleep(1)
 
