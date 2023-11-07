@@ -55,7 +55,7 @@ def mergeDico(dicoDocu, dicoOnduleur, pointOrigin):
 # fonction pour récupérer un model sous la forme d'un dico mergé
 def getModel(dicoOrigin, numModel):
     # /!\ changer chemin pour que l'import marche de nimport ou
-    with open(f"./mods/sunspec_debug_panel/src/models/json/model_{numModel}.json") as jsonFile:
+    with open(f"./mods/sunspec_debug_pannel/src/models/json/model_{numModel}.json") as jsonFile:
         dicoModel = json.load(jsonFile)
     pointOrigin = dicoOrigin
     dicoOrigin = dicoOrigin.get_dict(computed=True)
@@ -90,7 +90,7 @@ def sortModels(onduleur: client.SunSpecModbusClientDeviceTCP):
 
 def getOnduleurs(refresh=False):
     # cheminFichier = "sunData/cache/discovered.mem"
-    cheminFichier = discover("./mods/sunspec_debug_panel/src", refresh)
+    cheminFichier = discover("./mods/sunspec_debug_pannel/src", refresh)
     with open(cheminFichier, "r") as f:
         data = json.load(f)
     return data

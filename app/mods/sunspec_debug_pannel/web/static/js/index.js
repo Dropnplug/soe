@@ -7,7 +7,7 @@ function createList(){
     for (let ip in onduleurs){
         let lien = document.createElement("a")
         let p = document.createElement("p")
-        lien.setAttribute("href", "/sunspec_debug_panel/onduleur?ip=" + ip + "&port=" + onduleurs[ip]["port"] + "&slave_id=" + onduleurs[ip]["slave_id"])
+        lien.setAttribute("href", "/sunspec_debug_pannel/onduleur?ip=" + ip + "&port=" + onduleurs[ip]["port"] + "&slave_id=" + onduleurs[ip]["slave_id"])
         lien.innerText = ip
         p.appendChild(lien)
         listeOnduleurs.appendChild(p)
@@ -21,7 +21,7 @@ function requestOnduleur(poubelle, refresh=false){
     let req = new XMLHttpRequest();
     req.addEventListener("load", createList);
     req.addEventListener("error", errorOnRequest);
-    req.open("POST", "/sunspec_debug_panel/getOnduleurs");
+    req.open("POST", "/sunspec_debug_pannel/getOnduleurs");
     let data = JSON.stringify({"refresh": refresh})
     req.send(data);
 }
@@ -34,7 +34,7 @@ function formSubmit(event) {
     event.preventDefault();
     let formData = new FormData(event.target);
     let values = Object.fromEntries(formData);
-    window.location.href="/sunspec_debug_panel/onduleur?ip=" + values["ip"] + "&port=" + values["port"] + "&slave_id=" + values["slave_id"];
+    window.location.href="/sunspec_debug_pannel/onduleur?ip=" + values["ip"] + "&port=" + values["port"] + "&slave_id=" + values["slave_id"];
 }
 
 function checkForm(){

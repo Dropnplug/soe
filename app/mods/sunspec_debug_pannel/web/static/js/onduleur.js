@@ -179,7 +179,7 @@ function requestModel() {
     displayLoader()
     let req = new XMLHttpRequest();
     req.addEventListener("load", createTab);
-    req.open("POST", "/sunspec_debug_panel/getModels");
+    req.open("POST", "/sunspec_debug_pannel/getModels");
     let data = JSON.stringify({"ip": ip, "port": port, "slave_id": slave_id})
     req.send(data);
 }
@@ -187,7 +187,7 @@ function requestModel() {
 function updateValue(elem, pointRoute){
     elem.disabled = true
     let req = new XMLHttpRequest();
-    req.open("POST", "/sunspec_debug_panel/setPoint");
+    req.open("POST", "/sunspec_debug_pannel/setPoint");
     let data = JSON.stringify({"pointRoute": pointRoute, "val": elem.previousSibling.value, "ip": ip, "port": port, "slave_id": slave_id})
     req.boutonSubmit = elem
     req.addEventListener("load", notifyAction);
