@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block title %}SOE{% endblock %}
+{% block head %}
+    <link type="text/css" rel="stylesheet" href="/static/mods/soe/css/main.css">
+    {% block head_soe %}
+    {% endblock %}
+{% endblock %}
+
+{% block body %}
+    {% block body_soe %}
+    {% endblock %}
+{% endblock %}
+
+{% block footer %}
+    {% block footer_soe %}
+        {% include "/mods/soe/src/footer.html" %}
+    {% endblock %}
+{% endblock %}
