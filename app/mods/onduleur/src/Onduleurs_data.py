@@ -42,8 +42,8 @@ class Onduleurs(multiprocessing.Process):
                 for key, value in sorted(to_do.items()):
                     ret = getattr(self._onduleurs, value["attr"])(*value["args"], **value["kwargs"])
                     memo["onduleurs_data"].set_response(key, ret)
-            except:
-                pass # log ?
+            except Exception as e:
+                print(e)
             time.sleep(max(config.SLEEP - (time.time() - start_time), 0))
         time.sleep(1)
 
