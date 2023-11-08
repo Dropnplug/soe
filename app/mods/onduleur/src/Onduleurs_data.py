@@ -11,10 +11,10 @@ class _Attr():
     def __init__(self, attr):
         self.attr = attr
 
-    def send(self, *args, **kwargs):
+    def send(self, *args, _timeout:int=3, **kwargs):
         key = str(time.time())+self.attr
         memo["onduleurs_data"].set_request(key, self.attr, *args, **kwargs)
-        for _ in range(int(1/config.SLEEP)):
+        for _ in range(int(_timeout/config.SLEEP)):
             start_time = time.time()
             ret = memo["onduleurs_data"].check_response(key)
             if ret is not None:

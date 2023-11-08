@@ -7,8 +7,11 @@
 {% endblock %}
 
 {% block body %}
-    {% block body_soe %}
-    {% endblock %}
+    {% include "/mods/soe/src/shortcut.html" %}
+    <div class="body_soe">
+        {% block body_soe %}
+        {% endblock %}
+    </div>
 {% endblock %}
 
 {% block footer %}

@@ -1,1 +1,48 @@
-@import "var.css";
+@import "./var.css";
+
+.body_soe {
+    width: 100%;
+}
+
+.body_soe div{
+    width: 100%;
+    padding: 20px;
+}
+
+.body_soe div:nth-child(even) {
+    background-color: color-mix(in srgb, var(--main-color) 20%, white);
+}
+
+footer {
+    background-color: #313a42;
+    color: white;
+}
+
+.shortcut {
+    position: sticky;
+	top: 0;
+	width: 100%;
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: left;
+    background-color: var(--sec-color);
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+}
+
+.shortcut div {
+	display: flex;
+}
+
+.shortcut img{
+	height: 24px;
+}
+.shortcut img{
+	height: 24px;
+}
+.shortcut a{
+	margin: auto;
+	height: fit-content;
+	margin-inline: 5px;
+	padding: 0;
+}
