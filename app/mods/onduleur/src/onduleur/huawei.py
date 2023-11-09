@@ -493,7 +493,7 @@ class OnduleurHuawei(Onduleur):
         super().__init__()
         self.utilisateur = utilisateur
         self.mdp = mdp
-        self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId))
+        self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId, timeout=1))
         self.pmax = self.getPmax()
         self.nbPvMax = self._get("Nb pv max")
 

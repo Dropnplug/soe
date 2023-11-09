@@ -78,3 +78,23 @@ class Onduleur():
     
     def redemerage(self):  # Il faudra éteindre l'onduleur, puis faire un wake on lan
         return None
+    
+    def getToutesLesDonneesBDD(self):
+        data = {}
+        data["puissance_dc"] = self.getPdc()
+        data["tension_dc"] = self.getTdc()
+        data["courant_dc"] = self.getCdc()
+        data["puissance_ac"] = self.getPac()
+        data["puissance_ac_par_phase"] = self.getPacPP()
+        data["tension_ac"] = self.getTac()
+        data["tension_ac_par_phase"] = self.getPacPP()
+        data["courant_ac"] = self.getCac()
+        data["courant_ac_par_phase"] = self.getCacPP()
+        data["frequence_ac"] = self.getFac()
+        data["frequence_ac_par_phase"] = self.getFacPP()
+        data["facteur_de_limitation_de_puissance"] = self.getFactLimP()
+        data["dephasage_cos_phi"] = self.getDCosPhi()
+        data["temperature"] = self.getTemp()
+        data["puissance_reactive"] = self.getPreac()
+        data["defaut"] = self.getDefaut()
+        return data
