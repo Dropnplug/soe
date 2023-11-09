@@ -39,14 +39,14 @@ class _Onduleurs():
             mac = re.findall(p, res.stdout)[0].replace('-', ':')
             
             # création de l'objet onduleur
-            print("1")
+            print("début création onduleur")
             erreur = False
             try:
                 self.onduleurs[mac+"_"+str(onduleur["slave_id"])] = onduleur["type"](onduleur["ip"], onduleur["port"], slaveId=onduleur["slave_id"], utilisateur=onduleur["utilisateur"], mdp=onduleur["mdp"])
             except Exception as e:
                 erreur = True
-                print("Erreur lors de la création d'un onduleur", e)
-            print("2")
+                # print("Erreur lors de la création d'un onduleur", e)
+            print("fin création onduleur")
             
             # ajout à la bdd de l'onduleur
             if not erreur:
