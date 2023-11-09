@@ -34,14 +34,14 @@ class _Onduleurs():
 
     def ajouterOnduleurs(self):
         onduleurHardcoder = [
-                # {
-                #     "ip": "192.168.100.161",
-                #     "port" : 6607,
-                #     "type" : OnduleurHuawei,
-                #     "slave_id" : 0,
-                #     "utilisateur" : "installer",
-                #     "mdp" : "Emeraude7850"
-                # },
+                {
+                    "ip": "192.168.100.161",
+                    "port" : 6607,
+                    "type" : OnduleurHuawei,
+                    "slave_id" : 0,
+                    "utilisateur" : "installer",
+                    "mdp" : "Emeraude7850"
+                },
                 {
                     "ip": "192.168.100.161",
                     "port" : 6607,
