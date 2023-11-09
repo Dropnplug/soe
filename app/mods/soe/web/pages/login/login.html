@@ -1,0 +1,21 @@
+{% extends "/mods/soe/main.html" %}
+
+{% block title %}soe{% endblock %}
+
+{% block head_soe %}
+    <script type="text/javascript" src="/static/js/src/sha256.js"></script>
+    <script type="text/javascript" src="/static/js/login.js"></script>
+{% endblock %}
+
+{% block body_soe %}
+<div style="margin-left: auto;margin-right: auto;margin-top: 20vh; width: fit-content;">
+    <form name="login" id="login" onsubmit="prelogin();" action="/login" method="post">
+        <label>Email</label>
+        <input name="email" type="email" id="email">
+        <label>Mot de Passe</label>
+        <input name="password" type="password" id="password">
+        <input name="redirect" type="hidden" value="/soe/">
+        <button type="submit">Connexion</button>
+    </form>
+</div>
+{% endblock %}
