@@ -1,3 +1,4 @@
+import sys
 from huawei_solar import AsyncHuaweiSolar, HuaweiSolarBridge
 from pymodbus.payload import BinaryPayloadBuilder, BinaryPayloadDecoder
 from pymodbus.constants import Endian
@@ -493,9 +494,12 @@ class OnduleurHuawei(Onduleur):
         super().__init__()
         self.utilisateur = utilisateur
         self.mdp = mdp
-        self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId, timeout=1))
-        self.pmax = self.getPmax()
-        self.nbPvMax = self._get("Nb pv max")
+        try:
+            self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId, timeout=1))
+            self.pmax = self.getPmax()
+            self.nbPvMax = self._get("Nb pv max")
+        except:
+            pass
 
     def _get(self, nom, maxRe: int = 3):
         try:

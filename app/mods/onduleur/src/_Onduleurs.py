@@ -1,5 +1,6 @@
 from subprocess import check_output, run
 import re
+import sys
 import time
 from .onduleur import OnduleurSunspec, OnduleurHuawei
 from src.mysql_src import mysqlite
@@ -13,14 +14,14 @@ class _Onduleurs():
 
     def ajouterOnduleurs(self):
         onduleurHardcoder = [
-                {
-                    "ip": "192.168.100.161",
-                    "port" : 6607,
-                    "type" : OnduleurHuawei,
-                    "slave_id" : 0,
-                    "utilisateur" : "installer",
-                    "mdp" : "Emeraude7850"
-                },
+                # {
+                #     "ip": "192.168.100.161",
+                #     "port" : 6607,
+                #     "type" : OnduleurHuawei,
+                #     "slave_id" : 0,
+                #     "utilisateur" : "installer",
+                #     "mdp" : "Emeraude7850"
+                # },
                 {
                     "ip": "192.168.100.161",
                     "port" : 6607,
@@ -42,7 +43,14 @@ class _Onduleurs():
             print("début création onduleur")
             erreur = False
             try:
-                self.onduleurs[mac+"_"+str(onduleur["slave_id"])] = onduleur["type"](onduleur["ip"], onduleur["port"], slaveId=onduleur["slave_id"], utilisateur=onduleur["utilisateur"], mdp=onduleur["mdp"])
+                def handleEx(*args, **kwargs):
+                    print("dlkfh")
+                builtInHook = sys.excepthook
+                sys.excepthook = handleEx
+                ondul = onduleur["type"](onduleur["ip"], onduleur["port"], slaveId=onduleur["slave_id"], utilisateur=onduleur["utilisateur"], mdp=onduleur["mdp"])
+                sys.excepthook = builtInHook
+                
+                self.onduleurs[mac+"_"+str(onduleur["slave_id"])] = ondul
             except Exception as e:
                 erreur = True
                 # print("Erreur lors de la création d'un onduleur", e)
@@ -54,7 +62,7 @@ class _Onduleurs():
                 if res == []:
                     res = mysqlite.exec("insert into onduleur (nom, mac, type, slave_id) onduleurs (?, ?, ?, ?)", (self.onduleurs[mac+"_"+str(onduleur["slave_id"])].getNom(), mac, onduleur["type"].__name__, onduleur["slave_id"]))
 
-        print(self.onduleurs)
+        print("la liste des onduleurs", self.onduleurs)
         return "prout"
 
     def execOnduleur(self, mac, slave_id, cmd, *args, **kwargs):
