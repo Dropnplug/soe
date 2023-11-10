@@ -12,7 +12,7 @@ if not memo["onduleurs_data"]:
 	Onduleurs().start()
 
 memo["onduleurs_data"].ajouterOnduleurs(_timeout=10)
-task.add(REPEAT_TASK_ON_TIMER(60, config.UPDATE_DB), name="onduleurs_update_db", replace=True)
+task.add(REPEAT_TASK_ON_TIMER(config.UPDATE_DB, update_db), name="onduleurs_update_db", replace=True)
 
 # memo["onduleurs_data"].majAllDataBdd(_timeout=100)
 
