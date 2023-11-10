@@ -92,7 +92,6 @@ class _Onduleurs():
     
     def majAllDataBdd(self):
         data = self.getAllDataTousLesOnduleurs()
-        print(data)
         for mac_slaveId, donnee in data.items():
             mysqlite.exec("INSERT INTO data (slave_id, puissance_dc, tension_dc, courant_dc, puissance_ac, puissance_ac_par_phase, tension_ac, tension_ac_par_phase, courant_ac, courant_ac_par_phase, frequence_ac, frequence_ac_par_phase, facteur_de_limitation_de_puissance, dephasage_cos_phi, temperature, puissance_reactive, defaut, mac_onduleur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (mac_slaveId.split("_")[1], json.dumps(donnee["puissance_dc"]), json.dumps(donnee["tension_dc"]), json.dumps(donnee["courant_dc"]), donnee["puissance_ac"], "|".join(map(str, donnee["puissance_ac_par_phase"])), donnee["tension_ac"], "|".join(map(str, donnee["tension_ac_par_phase"])), donnee["courant_ac"], "|".join(map(str, donnee["courant_ac_par_phase"])), donnee["frequence_ac"], "|".join(map(str, donnee["frequence_ac_par_phase"])), donnee["facteur_de_limitation_de_puissance"], donnee["dephasage_cos_phi"], donnee["temperature"], donnee["puissance_reactive"], "|".join(map(str, donnee["defaut"])), mac_slaveId.split("_")[0]))
 

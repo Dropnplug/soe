@@ -1,1 +1,2 @@
 SLEEP = 0.1
+UPDATE_DB = 600
