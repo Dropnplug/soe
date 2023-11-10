@@ -32,6 +32,7 @@ ARP_MAC_SEP = "-"
 class _Onduleurs():
     def __init__(self):
         self.onduleurs = {}
+        self.onduleurInitialise = False
 
     def ajouterOnduleurs(self):
         onduleurHardcoder = [
@@ -58,7 +59,10 @@ class _Onduleurs():
             check_output("ping -n 1 " + onduleur["ip"])
             res = run(["arp", "-"+APR_CMD_FLAG, onduleur["ip"]], capture_output=True, text=True)
             p = re.compile(r'([0-9a-f]{2}(?:'+ARP_MAC_SEP+'[0-9a-f]{2}){5})', re.IGNORECASE)
-            mac = re.findall(p, res.stdout)[0].replace('-', ':')
+            try:
+                mac = re.findall(p, res.stdout)[0].replace('-', ':')
+            except Exception as e:
+                print("Erreur pour trouver la mac adressse :", e)
             
             # création de l'objet onduleur
             erreur = False
@@ -72,6 +76,7 @@ class _Onduleurs():
                 res = mysqlite.exec("select mac from onduleur where mac='" + mac + "'")
                 if res == []:
                     res = mysqlite.exec("insert into onduleur (nom, mac, type, slave_id) values (?, ?, ?, ?)", (self.onduleurs[mac+"_"+str(onduleur["slave_id"])].getNom(), mac, onduleur["type"].__name__, onduleur["slave_id"]))
+                self.onduleurInitialise = True
 
     def execOnduleur(self, mac, slave_id, cmd, *args, **kwargs):
         with suppress_std(stdout=True):
@@ -90,3 +95,6 @@ class _Onduleurs():
         print(data)
         for mac_slaveId, donnee in data.items():
             mysqlite.exec("INSERT INTO data (slave_id, puissance_dc, tension_dc, courant_dc, puissance_ac, puissance_ac_par_phase, tension_ac, tension_ac_par_phase, courant_ac, courant_ac_par_phase, frequence_ac, frequence_ac_par_phase, facteur_de_limitation_de_puissance, dephasage_cos_phi, temperature, puissance_reactive, defaut, mac_onduleur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (mac_slaveId.split("_")[1], json.dumps(donnee["puissance_dc"]), json.dumps(donnee["tension_dc"]), json.dumps(donnee["courant_dc"]), donnee["puissance_ac"], "|".join(map(str, donnee["puissance_ac_par_phase"])), donnee["tension_ac"], "|".join(map(str, donnee["tension_ac_par_phase"])), donnee["courant_ac"], "|".join(map(str, donnee["courant_ac_par_phase"])), donnee["frequence_ac"], "|".join(map(str, donnee["frequence_ac_par_phase"])), donnee["facteur_de_limitation_de_puissance"], donnee["dephasage_cos_phi"], donnee["temperature"], donnee["puissance_reactive"], "|".join(map(str, donnee["defaut"])), mac_slaveId.split("_")[0]))
+
+    def isReady(self):
+        return self.onduleurInitialise
