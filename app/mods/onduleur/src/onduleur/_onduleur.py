@@ -2,6 +2,7 @@
 class Onduleur():
     def __init__(self) -> None:
         print("Initialisation d'un onduleur")
+        self.pmax = self.getPmax()
 
     def getNom(self):  # Nom de l'onduleur
         return None
@@ -98,3 +99,6 @@ class Onduleur():
         data["puissance_reactive"] = self.getPreac()
         data["defaut"] = self.getDefaut()
         return data
+
+    def getPmax(self):
+        return None

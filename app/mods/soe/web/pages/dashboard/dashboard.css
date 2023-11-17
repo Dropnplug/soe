@@ -3,5 +3,17 @@ section {
 }
 
 article {
-    /* width: 50%; */
+    display: flex;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.chartPuissance {
+    max-height: 15em;
+}
+
+h1 {
+    margin-bottom: 1em;
 }

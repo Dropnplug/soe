@@ -5,6 +5,9 @@
 {% block head_soe %}
     <script type="text/javascript" src="/static/mods/soe/pages/js/dashboard/dashboard.js"></script>
     <link rel="stylesheet" href="/static/mods/soe/pages/css/dashboard/dashboard.css">
+
+    <script type="text/javascript" src="/static/mods/soe/libs/Chart/Chart.js"></script>
+
 {% endblock %}
 
 {% block body_soe %}
@@ -14,11 +17,22 @@
         <h3>
             Puissance DC
         </h3>
+        <h3 id="puissanceDC"></h3>
+        <span class="chartPuissance">
+            <canvas id="canvasPuissanceDC"></canvas>
+        </span>
     </article>
     <article>
         <h3>
             Puissance AC
         </h3>
+        <h3 id="puissanceAC"></h3>
+        <span class="chartPuissance">
+            <canvas id="canvasPuissanceAC"></canvas>
+        </span>
     </article>
+    <section>
+        
+    </section>
 </section>
 {% endblock %}

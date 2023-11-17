@@ -75,7 +75,7 @@ class _Onduleurs():
             if not erreur:
                 res = mysqlite.exec("select mac from onduleur where mac='" + mac + "'")
                 if res == []:
-                    res = mysqlite.exec("insert into onduleur (nom, mac, type, slave_id) values (?, ?, ?, ?)", (self.onduleurs[mac+"_"+str(onduleur["slave_id"])].getNom(), mac, onduleur["type"].__name__, onduleur["slave_id"]))
+                    res = mysqlite.exec("insert into onduleur (nom, mac, type, slave_id, pmax) values (?, ?, ?, ?, ?)", (self.onduleurs[mac+"_"+str(onduleur["slave_id"])].getNom(), mac, onduleur["type"].__name__, onduleur["slave_id"], self.onduleurs[mac+"_"+str(onduleur["slave_id"])].pmax))
                 self.onduleurInitialise = True
 
     def execOnduleur(self, mac, slave_id, cmd, *args, **kwargs):

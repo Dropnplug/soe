@@ -492,13 +492,12 @@ STATE_CODES_3 = {
 
 class OnduleurHuawei(Onduleur):
     def __init__(self, ip, port, slaveId:int=0, utilisateur:str=None, mdp:str=None):
-        super().__init__()
         self.utilisateur = utilisateur
         self.mdp = mdp
         try:
             self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId, timeout=1))
-            self.pmax = self.getPmax()
             self.nbPvMax = self._get("Nb pv max")
+            super().__init__()
         except:
             pass
 
