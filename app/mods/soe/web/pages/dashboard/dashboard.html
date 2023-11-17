@@ -13,26 +13,54 @@
 {% block body_soe %}
 <h1>Dashboard : Devanture Drop'n Plug</h1>
 <section>
-    <article>
-        <h3>
-            Puissance DC
-        </h3>
-        <h3 id="puissanceDC"></h3>
-        <span class="chartPuissance">
-            <canvas id="canvasPuissanceDC"></canvas>
-        </span>
-    </article>
-    <article>
-        <h3>
-            Puissance AC
-        </h3>
-        <h3 id="puissanceAC"></h3>
-        <span class="chartPuissance">
-            <canvas id="canvasPuissanceAC"></canvas>
-        </span>
-    </article>
-    <section>
-        
+    <section class="prodTempsReel">
+        <article>
+            <h3>
+                Puissance DC
+            </h3>
+            <h3 id="puissanceDC"></h3>
+            <span class="chartPuissance">
+                <canvas id="canvasPuissanceDC"></canvas>
+            </span>
+        </article>
+        <article>
+            <h3>
+                Puissance AC
+            </h3>
+            <h3 id="puissanceAC"></h3>
+            <span class="chartPuissance">
+                <canvas id="canvasPuissanceAC"></canvas>
+            </span>
+        </article>
+    </section>
+
+    <section class="hitorique">
+            <h3>
+                Historique de production total par mois (AC kW)
+            </h3>
+            
+            <select name="inputHistoMois" id="inputHistoMois">
+                <option value="">Mois</option>
+            </select>
+            <select name="inputHistoAnnee" id="inputHistoAnnee">
+                <option value="">Année</option>
+            </select>
+            <script>
+                let inputHistoMois = document.getElementById("inputHistoMois")
+                listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+                for (mois in listeMois) {
+                    let opt = document.createElement("option")
+                    opt.value = listeMois[mois]
+                    opt.innerText = listeMois[mois]
+                    inputHistoMois.appendChild(opt)
+                }
+                // ajouter écouteur pour maj le graph
+                inputHistoMois.addEventListener("onchange", {})
+            </script>
+
+            <span class="chartHistorique">
+                <canvas id="canvasHistoriqueAC"></canvas>
+            </span>
     </section>
 </section>
 {% endblock %}

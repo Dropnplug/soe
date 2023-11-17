@@ -1,5 +1,12 @@
-section {
+section, .hitorique {
     display: flex;
+    flex-direction: column;
+}
+
+section section {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 article {
@@ -14,6 +21,21 @@ article {
     max-height: 15em;
 }
 
+.chartHistorique {
+    height: 20em;
+    padding: 1em;
+    width: 50%;
+}
+
 h1 {
+    margin-top: 1em;
     margin-bottom: 1em;
+}
+
+h3 + h3 {
+    font-size: 1.5em;
+    background-color: var(--main-color);
+    width: fit-content;
+    padding: 0.5em;
+    border-radius: 10px;
 }

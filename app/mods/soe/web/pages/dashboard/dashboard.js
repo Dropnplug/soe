@@ -1,11 +1,16 @@
 const listeCouleur = ["chartreuse", "DarkGreen", "blue", "green", "lime", "DarkCyan"]
 
 request("GET", "/soe/dashboard/data/").then(data => {
-    console.log(data)
     // création de la page à partir des données de la bdd
     creerAffichageACDC(data)
-    // creerAffichageDC(data)
-    // creerAffichageAC(data)
+})
+
+// construction du graph de l'historique
+let now = new Date()
+let start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30).toISOString().slice(0, 10);
+request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":"now"}).then(data => {
+    console.log(data)
+    creerAffichageHistoriqueDC(data)
 })
 
 function creerAffichageACDC(data) {
@@ -26,13 +31,13 @@ function creerAffichageACDC(data) {
         colorPuissance.push(listeCouleur[indCouleur % listeCouleur.length])
         indCouleur = indCouleur + 1
     }
-    document.getElementById("puissanceDC").innerText = dcPuissance
+    document.getElementById("puissanceDC").innerText = dcPuissance + " kW"
 
     let acPuissance = 0
     for (let onduleur in data) {
         acPuissance = acPuissance + data[onduleur]["puissance_ac"]
     }
-    document.getElementById("puissanceAC").innerText = acPuissance
+    document.getElementById("puissanceAC").innerText = acPuissance + " kW"
 
     request("GET", "/soe/dashboard/onduleursInfo/").then(data => {
         // on récupère la pmax de tous les onduleurs et on les parcours pour en faire la sommme
@@ -157,5 +162,30 @@ function creerAffichageACDC(data) {
                 }
             }
         })
+    })
+}
+
+function creerAffichageHistoriqueDC(data){
+    let datasets = {}
+    for (onduleur in data) {
+        console.log(data[onduleur])
+        datasets["labels"]
+        datasets[data[onduleur]["time"]]
+    }
+
+    let canvasHisto = document.getElementById("canvasHistoriqueAC");
+    new Chart(canvasHisto, {
+        type: 'bar',
+        data: {
+            labels:["a","a","a","a","a","a","a"],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+        }
     })
 }
