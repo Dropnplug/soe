@@ -22,9 +22,9 @@ article {
 }
 
 .chartHistorique {
-    height: 20em;
+    height: 30em;
     padding: 1em;
-    width: 50%;
+    width: 70%;
 }
 
 h1 {
@@ -38,4 +38,14 @@ h3 + h3 {
     width: fit-content;
     padding: 0.5em;
     border-radius: 10px;
+}
+
+.hitorique article {
+    display: flex;
+    flex-direction: row;
+    margin: 1em 0 1em 0;
+}
+
+select {
+    margin: 0 1em 0 1em;
 }

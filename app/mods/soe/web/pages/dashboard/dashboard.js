@@ -1,17 +1,29 @@
 const listeCouleur = ["chartreuse", "DarkGreen", "blue", "green", "lime", "DarkCyan"]
+const anneMinHisto = 2022
+const listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
 request("GET", "/soe/dashboard/data/").then(data => {
     // création de la page à partir des données de la bdd
     creerAffichageACDC(data)
 })
 
+function getMonthFromString(nom){
+    return new Date(Date.parse(nom +" 1, 2012")).getMonth()+1
+}
+
 // construction du graph de l'historique
-let now = new Date()
-let start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30).toISOString().slice(0, 10);
-request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":"now"}).then(data => {
-    console.log(data)
-    creerAffichageHistoriqueDC(data)
-})
+function requestHistoAC() {
+    // recup value des inputs
+    let inputHistoMois = document.getElementById("inputHistoMois")
+    let inputHistoAnnee = document.getElementById("inputHistoAnnee")
+    let mois = listeMois.indexOf(inputHistoMois.value)+1
+    let annee = Number(inputHistoAnnee.value)
+    let start = new Date(annee, mois-1, 1)
+    let end = new Date(annee, mois-1, new Date(annee, mois, 0).getDate())
+    request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":end}).then(data => {
+        creerAffichageHistoriqueAC(data, new Date(annee, mois, 0).getDate())
+    })
+}
 
 function creerAffichageACDC(data) {
     let dcPuissance = 0
@@ -154,8 +166,7 @@ function creerAffichageACDC(data) {
                         callbacks: {
                             label: function(ctx) {
                                 let dataset = ctx.dataset;
-                                console.log("qdlfkh")
-                                return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kW"];
+                                return dataset.label + " : " + dataset.data[ctx.dataIndex];
                             }
                         }
                     }
@@ -165,27 +176,96 @@ function creerAffichageACDC(data) {
     })
 }
 
-function creerAffichageHistoriqueDC(data){
-    let datasets = {}
+function creerAffichageHistoriqueAC(data, nbJourMois){
+    sommePuissanceParJour = {}
+    for (let i = 0; i < nbJourMois; i++) {
+        sommePuissanceParJour[i+1] = 0
+    }
     for (onduleur in data) {
-        console.log(data[onduleur])
-        datasets["labels"]
-        datasets[data[onduleur]["time"]]
+        jour = new Date(data[onduleur]["time"]).getDay()
+        sommePuissanceParJour[jour] = sommePuissanceParJour[jour] + data[onduleur]["puissance_ac"]
+    }
+    
+    dataPuissanceMois = []
+    labelPuissanceMois = []
+    for(jour in sommePuissanceParJour) {
+        dataPuissanceMois.push(sommePuissanceParJour[jour])
+        labelPuissanceMois.push(jour)
+    }
+
+    let inputHistoMois = document.getElementById("inputHistoMois")
+
+    // on vérifie que yai pas déjà un chart et si y en a un on update et on se casse
+    let chart = Chart.getChart("canvasHistoriqueAC")
+    if (chart) {
+        chart.data.labels = labelPuissanceMois
+        chart.data.datasets[0].data = dataPuissanceMois
+        chart.data.datasets[0].labels = dataPuissanceMois
+        chart.update()
+        return
     }
 
     let canvasHisto = document.getElementById("canvasHistoriqueAC");
     new Chart(canvasHisto, {
         type: 'bar',
         data: {
-            labels:["a","a","a","a","a","a","a"],
+            labels: labelPuissanceMois,
             datasets: [{
-                label: 'My First Dataset',
-                data: [65, 59, 80, 81, 56, 55, 40],
+                label: 'Puissance AC kW par jour',
+                data: dataPuissanceMois,
+                backgroundColor: "#17b69d",
                 borderWidth: 1
             }]
         },
         options: {
             maintainAspectRatio: false,
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value, index, ticks) {
+                            return value + ' kW';
+                        }
+                    },
+                    title: {
+                        color: 'black',
+                        display: true,
+                        text: 'Puissance'
+                    }
+                },
+                x: {
+                    ticks: {
+                        callback: function(value, index, ticks) {
+                            let mois = listeMois.indexOf(inputHistoMois.value)+1
+                            if (String(mois).length == 1) {
+                                mois = "0" + mois
+                            }
+                            if (String(value+1).length == 1) {
+                                return "0" + (value+1) + "/" + mois;
+                            }
+                            return (value+1) + "/" + mois;
+                        }
+                    },
+                    title: {
+                        color: 'black',
+                        display: true,
+                        text: 'Jour'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            let dataset = ctx.dataset;
+                            console.log("dalur")
+                            return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kW"];
+                        }
+                    }
+                }
+            }
         }
     })
 }

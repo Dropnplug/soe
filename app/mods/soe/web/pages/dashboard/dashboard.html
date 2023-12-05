@@ -38,24 +38,38 @@
             <h3>
                 Historique de production total par mois (AC kW)
             </h3>
-            
-            <select name="inputHistoMois" id="inputHistoMois">
-                <option value="">Mois</option>
-            </select>
-            <select name="inputHistoAnnee" id="inputHistoAnnee">
-                <option value="">Année</option>
-            </select>
+            <article>
+                <label for="inputHistoMois">Mois</label>
+                <select onchange="requestHistoAC()" name="inputHistoMois" id="inputHistoMois">
+                </select>
+                <label for="inputHistoAnnee">Année</label>
+                <select onchange="requestHistoAC()" name="inputHistoAnnee" id="inputHistoAnnee">
+                </select>
+            </article>
             <script>
+                let inputHistoAnnee = document.getElementById("inputHistoAnnee")
                 let inputHistoMois = document.getElementById("inputHistoMois")
-                listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+                let now = new Date()
+                let moisActu = now.getMonth()
                 for (mois in listeMois) {
                     let opt = document.createElement("option")
                     opt.value = listeMois[mois]
                     opt.innerText = listeMois[mois]
                     inputHistoMois.appendChild(opt)
+                    if (listeMois[mois] == listeMois[moisActu]) {
+                        inputHistoMois.value = listeMois[moisActu]
+                    }
                 }
-                // ajouter écouteur pour maj le graph
-                inputHistoMois.addEventListener("onchange", {})
+
+                for (let i = anneMinHisto; i <= now.getFullYear(); i++) {
+                    let opt = document.createElement("option")
+                    opt.value = i
+                    opt.innerText = i
+                    inputHistoAnnee.appendChild(opt)
+                }
+                inputHistoAnnee.value = now.getFullYear();
+
+                requestHistoAC()
             </script>
 
             <span class="chartHistorique">

@@ -65,6 +65,9 @@ class Onduleur():
     def getDefaut(self):  # Defauts de l'onduleurs (alarmes)
         return None
     
+    def getEtat(self):  # Status de l'onduleur
+        return None
+    
     def setFactLimP(self):  # Modification de la limitation de la puissance
         return None
     
@@ -98,6 +101,7 @@ class Onduleur():
         data["temperature"] = self.getTemp()
         data["puissance_reactive"] = self.getPreac()
         data["defaut"] = self.getDefaut()
+        data["etat"] = self.getEtat()
         return data
 
     def getPmax(self):
