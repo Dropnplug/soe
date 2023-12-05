@@ -13,6 +13,8 @@ def formatData(data):
         allData[donnee["mac_onduleur"]+"_"+str(donnee["slave_id"])]["puissance_dc"] = json.loads(donnee["puissance_dc"])
         allData[donnee["mac_onduleur"]+"_"+str(donnee["slave_id"])]["tension_ac_par_phase"] = [float(i) for i in donnee["tension_ac_par_phase"].split("|")]
         allData[donnee["mac_onduleur"]+"_"+str(donnee["slave_id"])]["tension_dc"] = json.loads(donnee["tension_dc"])
+        allData[donnee["mac_onduleur"]+"_"+str(donnee["slave_id"])]["defaut"] = [str(i) for i in donnee["defaut"].split("|")]
+        allData[donnee["mac_onduleur"]+"_"+str(donnee["slave_id"])]["etat"] = [str(i) for i in donnee["etat"].split("|")]
     return allData
 
 def formatAllData(data):

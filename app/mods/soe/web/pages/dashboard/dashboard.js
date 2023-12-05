@@ -4,6 +4,7 @@ const listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juill
 
 request("GET", "/soe/dashboard/data/").then(data => {
     // création de la page à partir des données de la bdd
+    console.log(data)
     creerAffichageACDC(data)
 })
 
