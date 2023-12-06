@@ -1,5 +1,6 @@
 import json
-from subprocess import check_output, run
+import platform
+from subprocess import check_output, run, check_call, DEVNULL, STDOUT
 import re
 import sys
 import time
@@ -26,8 +27,18 @@ def suppress_std(stdout=False, stderr=False):
             if not stderr:
                 sys.stderr = old_stderr
 
+
+# detection d'os
 APR_CMD_FLAG = "a"
-ARP_MAC_SEP = "-"
+ARP_MAC_SEP = ":"
+PING_NB_FLAG = "c"
+systeme = platform.system()
+if systeme == "Windows":
+    ARP_MAC_SEP = "-"
+    PING_NB_FLAG = "n"
+elif systeme == "Linux":
+    ARP_MAC_SEP = ":"
+    PING_NB_FLAG = "c"
 
 class _Onduleurs():
     def __init__(self):
@@ -56,7 +67,7 @@ class _Onduleurs():
 
         for onduleur in onduleurHardcoder:
             # récupération de la mac address de l'onduleur à partir de son ip avec des commandes système
-            check_output("ping -n 1 " + onduleur["ip"])
+            check_call(["ping", "-"+PING_NB_FLAG+"1", onduleur["ip"]], stdout=DEVNULL, stderr=STDOUT)
             res = run(["arp", "-"+APR_CMD_FLAG, onduleur["ip"]], capture_output=True, text=True)
             p = re.compile(r'([0-9a-f]{2}(?:'+ARP_MAC_SEP+'[0-9a-f]{2}){5})', re.IGNORECASE)
             try:
