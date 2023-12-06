@@ -28,22 +28,21 @@ def suppress_std(stdout=False, stderr=False):
                 sys.stderr = old_stderr
 
 
-# detection d'os
-APR_CMD_FLAG = "a"
-ARP_MAC_SEP = ":"
-PING_NB_FLAG = "c"
-systeme = platform.system()
-if systeme == "Windows":
-    ARP_MAC_SEP = "-"
-    PING_NB_FLAG = "n"
-elif systeme == "Linux":
-    ARP_MAC_SEP = ":"
-    PING_NB_FLAG = "c"
-
 class _Onduleurs():
     def __init__(self):
         self.onduleurs = {}
         self.onduleurInitialise = False
+        # detection d'os
+        self.systeme = platform.system()
+        if self.systeme == "Windows":
+            arpMacSep = "-"
+            pingNbFlag = "n"
+        elif self.systeme == "Linux":
+            arpMacSep = ":"
+            pingNbFlag = "c"
+        self.APR_CMD_FLAG = "a"
+        self.ARP_MAC_SEP = arpMacSep
+        self.PING_NB_FLAG = pingNbFlag
 
     def ajouterOnduleurs(self):
         onduleurHardcoder = [
@@ -67,9 +66,13 @@ class _Onduleurs():
 
         for onduleur in onduleurHardcoder:
             # récupération de la mac address de l'onduleur à partir de son ip avec des commandes système
-            check_call(["ping", "-"+PING_NB_FLAG+"1", onduleur["ip"]], stdout=DEVNULL, stderr=STDOUT)
-            res = run(["arp", "-"+APR_CMD_FLAG, onduleur["ip"]], capture_output=True, text=True)
-            p = re.compile(r'([0-9a-f]{2}(?:'+ARP_MAC_SEP+'[0-9a-f]{2}){5})', re.IGNORECASE)
+            if self.systeme == "Windows":
+                check_output("ping " "-"+self.PING_NB_FLAG+" 1 "+ onduleur["ip"])
+            elif self.systeme == "Linux":
+                check_call(["ping", "-"+self.PING_NB_FLAG+"1", onduleur["ip"]], stdout=DEVNULL, stderr=STDOUT)
+            
+            res = run(["arp", "-"+self.APR_CMD_FLAG, onduleur["ip"]], capture_output=True, text=True)
+            p = re.compile(r'([0-9a-f]{2}(?:'+self.ARP_MAC_SEP+'[0-9a-f]{2}){5})', re.IGNORECASE)
             try:
                 mac = re.findall(p, res.stdout)[0].replace('-', ':')
             except Exception as e:
