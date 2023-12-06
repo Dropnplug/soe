@@ -4,7 +4,6 @@ const listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juill
 
 request("GET", "/soe/dashboard/data/").then(data => {
     // création de la page à partir des données de la bdd
-    console.log(data)
     creerAffichageACDC(data)
 })
 
@@ -24,6 +23,31 @@ function requestHistoAC() {
     request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":end}).then(data => {
         creerAffichageHistoriqueAC(data, new Date(annee, mois, 0).getDate())
     })
+}
+
+function creerTableauEtat(dataOnduleurs, lastDataFromBdd) {
+    let tableau = document.getElementById("tableauEtatOnduleurs")
+    console.log(lastDataFromBdd)
+    for (let donnee in dataOnduleurs) {
+        let ligne = document.createElement("tr")
+        let celluleNom = document.createElement("td")
+        let celluleSlaveID = document.createElement("td")
+        let celluleEtat = document.createElement("td")
+        
+        celluleNom.innerText = dataOnduleurs[donnee]["nom"]
+        celluleSlaveID.innerText = dataOnduleurs[donnee]["slave_id"]
+        celluleEtat.innerText = lastDataFromBdd[dataOnduleurs[donnee]["mac"] + "_" + dataOnduleurs[donnee]["slave_id"]]["etat"]
+        
+        ligne.classList.add("hide")
+        ligne.appendChild(celluleNom)
+        ligne.appendChild(celluleSlaveID)
+        ligne.appendChild(celluleEtat)
+        tableau.appendChild(ligne)
+        
+        setTimeout(() => {
+            ligne.classList.remove("hide")
+        }, 1);
+    }
 }
 
 function creerAffichageACDC(data) {
@@ -52,7 +76,11 @@ function creerAffichageACDC(data) {
     }
     document.getElementById("puissanceAC").innerText = acPuissance + " kW"
 
+    let lastDataFromBdd = data
+
     request("GET", "/soe/dashboard/onduleursInfo/").then(data => {
+        creerTableauEtat(data, lastDataFromBdd)
+
         // on récupère la pmax de tous les onduleurs et on les parcours pour en faire la sommme
         let allPmax = 0
         for (let onduleur in data) {
