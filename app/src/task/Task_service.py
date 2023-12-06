@@ -30,7 +30,7 @@ class Task_service(multiprocessing.Process):
 				logs("/!\\ error while running", task["name"])
 				mysqlite.exec("UPDATE task SET enabled = 0 WHERE id = ?", (task["id"],))
 				if config.DEBUG:
-					print(e)
+					print(task["name"], e)
 
 	def timeout(self):
 		rm = []

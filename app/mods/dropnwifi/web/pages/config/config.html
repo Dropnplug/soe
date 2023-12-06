@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block title %}Dropnwifi{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="/static/mods/dropnwifi/pages/js/config/config.js"></script>
+    <link rel="stylesheet" href="/static/mods/dropnwifi/pages/css/config/config.css">
+{% endblock %}
+
+{% block body %}
+<button onclick="enable_hotspot()">Activer le hotspot</button>
+<button onclick="disable_hotspot()">Désactiver le hotspot</button>
+{% endblock %}
