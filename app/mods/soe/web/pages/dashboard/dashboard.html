@@ -11,24 +11,17 @@
 {% endblock %}
 
 {% block body_soe %}
-<h1>Dashboard : Devanture Drop'n Plug</h1>
+<div style="display: flex;">
+    <div style="font-size: larger; position: absolute; width: fit-content; background-color: rgba(255, 2, 2, 0.5); border-radius: 10px;">🚧 En developpement 🚧</div>
+    <h1 style="margin: 0.5em;">Dashboard : centrale solaire photovoltaïque</h1>
+</div>
 <main>
     <section class="etatTempsReel">
         <h3>
-            État des Ondueleurs
+            État des Onduleurs
         </h3>
-        <table id="tableauEtatOnduleurs">
-            <colgroup>
-                <col span="1" style="width: 30%;">
-                <col span="1" style="width: 10%;">
-                <col span="1" style="width: 60%;">
-            </colgroup>
-            <tr>
-                <th>Nom</th>
-                <th>Slave ID</th>
-                <th>État</th>
-            </tr>
-        </table> 
+        <ol id="listeEtatOnduleurs" style="--length: 2" role="list">
+        </ol>
     </section>
     <section class="donneProduction">
         <section class="prodTempsReel">
@@ -48,6 +41,15 @@
                 <h3 id="puissanceAC"></h3>
                 <span class="chartPuissance">
                     <canvas id="canvasPuissanceAC"></canvas>
+                </span>
+            </article>
+            <article>
+                <h3>
+                    Puissance réactive
+                </h3>
+                <h3 id="puissanceReac"></h3>
+                <span class="chartPuissance">
+                    <canvas id="canvasPuissanceReac"></canvas>
                 </span>
             </article>
         </section>

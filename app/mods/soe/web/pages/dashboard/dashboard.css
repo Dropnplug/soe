@@ -69,6 +69,7 @@ h3 + h3 {
     width: fit-content;
     padding: 0.5em;
     border-radius: 10px;
+    color: white;
 }
 
 
@@ -83,45 +84,86 @@ h3 + h3 {
     padding-bottom: 1em;
 }
 
-.etatTempsReel table {
-    margin: 0;
-    width: 90%;
-    margin-top: 1em;
-    /* background-color: var(--main-color); */
+.hide {
+    opacity: 0;
+    padding: 0 10px;
 }
 
-/* pour ajouter du scroll plus tard */
-/* table {
-    max-height: 50%;
-    display: block;
-    overflow-y: scroll;
-} */
-
-th {
-    background-color: var(--main-color);
-}
-
-th, td {
-    /* border-bottom: 1px solid; */
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    border-radius: 0;
-}
-
-tr:nth-child(odd) {
-    background-color: rgba(127, 255, 212, 0.43);
-}
-
-td {
+li {
     opacity: 1;
     padding: 10px;
     line-height: 20px;
     transition: all 0.2s ease-in-out;
 } 
 
-.hide td {
-    opacity: 0;
-    line-height: 0px;
-    padding: 0 10px;
+.etatTempsReel p {
+	margin: 0;
+	line-height: 1.6;
+}
+
+ol {
+	list-style: none;
+	counter-reset: list;
+	padding: 0 2rem;
+    margin: 0;
+    width: 90%;
+}
+
+li {	
+	position: relative;
+	max-width: 45rem;
+	margin: 2rem auto;
+	padding: 2rem 1rem 1rem;
+	box-shadow: 0.1rem 0.1rem 1.5rem rgba(0, 0, 0, 0.3);
+	border-radius: 0.25rem;
+	overflow: hidden;
+	background-color: white;
+
+    opacity: 1;
+    transition: all 0.2s ease-in-out;
+}
+
+.etatTempsReel h4 {
+	display: flex;
+	align-items: baseline;
+	color: rgb(70 70 70);
+    font-size: 1.1em;
+}
+
+.etatTempsReel .titreEtatOnduleurs {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+.etatTempsReel span {
+    display: flex;
+	justify-content: center;
+	align-items: center;
+	flex: 0 0 auto;
+	width: 3rem;
+	height: 3rem;
+	padding: 1rem;
+	border-radius: 50%;
+	background-color: var(--main-color);
+	color: white;
+    font-weight: bolder;
+}
+
+.etatTempsReel .bandeauListe {
+    display: block;
+	width: 100%;
+	height: 1em;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: var(--main-color);
+    padding: 0;
+}
+
+.body_soe div:nth-child(2n) {
+    background-color: transparent;
 }
