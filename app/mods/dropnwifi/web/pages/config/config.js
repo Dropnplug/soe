@@ -5,3 +5,7 @@ function enable_hotspot() {
 function disable_hotspot() {
     request("GET", "/dropnwifi/config/disable_hotspot/").then(data => {})
 }
+
+function arp_scan() {
+    request("GET", "/dropnwifi/config/arp_scan/").then(data => {})
+}

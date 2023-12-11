@@ -110,7 +110,24 @@ class Dropnwifi():
         time.sleep(1)
         return ret
 
-    def arp_scan(self):
+    def nmap_scan(self):
+        ret = self._sudo_cmd("ifconfig | tr -s '[:space:]' '[\\n*]' | grep -o 192.168.*")
+        ret = ret.split("\n")[:-1]
+        scaned = []
+        result = []
+        for net in ret:
+            nmap_range = ".".join(net.split(".")[:-1])+".0/24"
+            if nmap_range not in scaned:
+                scaned.append(nmap_range)
+                res = self._sudo_cmd("nmap -sn -oG - "+nmap_range)
+                print(res)
+                res = res.split("\n")[1:-1]
+                print(res)
+        return True
+
+    def arp_scan(self, nmap_scan:bool=False):
+        if nmap_scan:
+            self.nmap_scan()
         ret =  self._sudo_cmd("arp -a")
         print(ret)
-        return ret
+        return False

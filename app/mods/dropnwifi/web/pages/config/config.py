@@ -19,3 +19,8 @@ def dropnwifi_config_enable_hotspot():
 @inspect_session(['dev'])
 def dropnwifi_config_disable_hotspot():
     return fl.jsonify({"succes":memo["dropnwifi_data"].disable_hotspot()})
+
+@app.route('/dropnwifi/config/arp_scan/', methods=['GET'])
+@inspect_session(['dev'])
+def dropnwifi_config_arp_scan():
+    return fl.jsonify({"succes":memo["dropnwifi_data"].arp_scan(nmap_scan=True)})
