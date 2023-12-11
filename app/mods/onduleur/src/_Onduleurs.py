@@ -82,8 +82,8 @@ class _Onduleurs():
             # création de l'objet onduleur
             erreur = False
             try:
-                # with suppress_std(stdout=True):
-                self.onduleurs[mac+"_"+str(onduleur["slave_id"])] = onduleur["type"](onduleur["ip"], onduleur["port"], slaveId=onduleur["slave_id"], utilisateur=onduleur["utilisateur"], mdp=onduleur["mdp"])
+                with suppress_std(stdout=True):
+                    self.onduleurs[mac+"_"+str(onduleur["slave_id"])] = onduleur["type"](onduleur["ip"], onduleur["port"], slaveId=onduleur["slave_id"], utilisateur=onduleur["utilisateur"], mdp=onduleur["mdp"])
             except:
                 erreur = True
             # ajout à la bdd de l'onduleur
