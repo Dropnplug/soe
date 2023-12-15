@@ -6,6 +6,9 @@ class Onduleur():
 
     def getNom(self):  # Nom de l'onduleur
         return None
+    
+    def getEnerTot(self):  # Total de l'énergie produite
+        return None
         
     def getPdc(self):  # Puissance DC onduleur
         return None
@@ -68,6 +71,9 @@ class Onduleur():
     def getEtat(self):  # Status de l'onduleur
         return None
     
+    def getPmax(self):  # Puissance max que l'onduleur peut supporter
+        return None
+    
     def setFactLimP(self):  # Modification de la limitation de la puissance
         return None
     
@@ -102,7 +108,5 @@ class Onduleur():
         data["puissance_reactive"] = self.getPreac()
         data["defaut"] = self.getDefaut()
         data["etat"] = self.getEtat()
+        data["energie_totale"] = self.getEnerTot()
         return data
-
-    def getPmax(self):
-        return None

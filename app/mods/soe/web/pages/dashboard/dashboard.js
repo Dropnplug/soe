@@ -32,17 +32,26 @@ function requestHistoAC() {
     // recup value des inputs
     let inputHistoMois = document.getElementById("inputHistoMois")
     let inputHistoAnnee = document.getElementById("inputHistoAnnee")
-    let mois = listeMois.indexOf(inputHistoMois.value)+1
-    let annee = Number(inputHistoAnnee.value)
-    let start = toIsoString(new Date(annee, mois-1)).substring(0, 10)
-    let end = toIsoString(new Date(annee, mois-1, new Date(annee, mois, 0).getDate())).substring(0, 10)
     
-    // le 30 dernier jour
+    let end
+    let start
     let now = new Date()
+    // le 30 dernier jour
     if (listeMois[now.getMonth()] == inputHistoMois.value && inputHistoAnnee.value == now.getFullYear() ) {
-        end = toIsoString(new Date()).substring(0, 10)
-        start = toIsoString(new Date(now.setMonth(now.getMonth()-1))).substring(0, 10)
+        end = new Date()
+        start = new Date(now.setMonth(now.getMonth()-1))
+    // le mois selectioné
+    } else {
+        let mois = listeMois.indexOf(inputHistoMois.value)+1
+        let annee = Number(inputHistoAnnee.value)
+        start = new Date(annee, mois-1)
+        end = new Date(annee, mois-1, new Date(annee, mois, 0).getDate())
     }
+
+    start.setDate(start.getDate() - 1)
+
+    start = toIsoString(start).substring(0, 10)
+    end = toIsoString(end).substring(0, 10)
 
     request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":end}).then(data => {
         creerAffichageHistoriqueAC(data, start, end)
@@ -55,6 +64,8 @@ function creerAffichageHistoriqueAC(data, start, end){
     end = new Date(end)
     start.setHours(0)
     end.setHours(0)
+
+    // on set tous les jours à afficher à 0
     for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
         let date = new Date(d)
         let jour = "0" + date.getDate()
@@ -64,24 +75,66 @@ function creerAffichageHistoriqueAC(data, start, end){
         sommePuissanceParJour[jour + "/" + mois] = 0
     }
     
-    for (onduleur in data) {
-        let date = new Date(data[onduleur]["time"])
-        let jour = "0" + date.getDate()
-        jour = jour.substring(jour.length - 2)
-        let mois = "0" + Number(date.getMonth() + 1)
-        mois = mois.substring(mois.length - 2)
-        sommePuissanceParJour[jour + "/" + mois] += data[onduleur]["puissance_ac"]
+    // on range les données par onduleur
+    let onduleursData = {}
+    for (donnee in data) {
+        if (onduleursData[data[donnee]["mac_onduleur"]+"_"+data[donnee]["slave_id"]] === undefined) {
+            onduleursData[data[donnee]["mac_onduleur"]+"_"+data[donnee]["slave_id"]] = []
+        }
+        onduleursData[data[donnee]["mac_onduleur"]+"_"+data[donnee]["slave_id"]].push(data[donnee])
     }
     
+    // on trouve l'énergie par jour et par onduleur : energieDuJour = energieJour - energieJour-1
+    puissanceParJourPArOnduleur = {}
+    for (let macOnduleur in onduleursData) {
+        puissanceParJourPArOnduleur[macOnduleur] = {}
+        Object.assign(puissanceParJourPArOnduleur[macOnduleur], sommePuissanceParJour)
+
+        for (let donnee in onduleursData[macOnduleur]) {
+            let date = new Date(onduleursData[macOnduleur][donnee]["time"])
+            let jour = "0" + date.getDate()
+            jour = jour.substring(jour.length - 2)
+            let mois = "0" + Number(date.getMonth() + 1)
+            mois = mois.substring(mois.length - 2)
+
+            if (puissanceParJourPArOnduleur[macOnduleur][jour + "/" + mois] < onduleursData[macOnduleur][donnee]["energie_totale"]) {
+                puissanceParJourPArOnduleur[macOnduleur][jour + "/" + mois] = onduleursData[macOnduleur][donnee]["energie_totale"]
+            }
+        }
+    }
+
+    for (let macOnduleur in puissanceParJourPArOnduleur) {
+        for (let jour in puissanceParJourPArOnduleur[macOnduleur]) {
+            sommePuissanceParJour[jour] += puissanceParJourPArOnduleur[macOnduleur][jour]
+        }
+    }
+
+    let jourAvant = undefined
+    for (jour in sommePuissanceParJour) {
+        if (jourAvant === undefined) {
+            jourAvant = jour
+            continue
+        }
+        if (sommePuissanceParJour[jour] != 0) {
+            sommePuissanceParJour[jour] = sommePuissanceParJour[jour] - sommePuissanceParJour[jourAvant]
+        }
+        jourAvant = jour
+    }
+
+    // remplissage des liste qui vont dans le graph
     dataPuissanceMois = []
     labelPuissanceMois = []
     for(jour in sommePuissanceParJour) {
-        dataPuissanceMois.push(sommePuissanceParJour[jour])
+        dataPuissanceMois.push(Number(sommePuissanceParJour[jour].toFixed(2)))
         labelPuissanceMois.push(jour)
     }
+    // on retire le premier jour pck il vient du mois d'avant
+    dataPuissanceMois.shift()
+    labelPuissanceMois.shift()
+
 
     // on vérifie que yai pas déjà un chart et si y en a un on update et on se casse
-    let chart = Chart.getChart("canvasHistoriqueAC")
+    let chart = Chart.getChart("canvasHistoriqueEnergie")
     if (chart) {
         chart.data.labels = labelPuissanceMois
         chart.data.datasets[0].data = dataPuissanceMois
@@ -90,13 +143,13 @@ function creerAffichageHistoriqueAC(data, start, end){
         return
     }
 
-    let canvasHisto = document.getElementById("canvasHistoriqueAC");
+    let canvasHisto = document.getElementById("canvasHistoriqueEnergie");
     new Chart(canvasHisto, {
         type: 'bar',
         data: {
             labels: labelPuissanceMois,
             datasets: [{
-                label: 'Puissance AC kW par jour',
+                label: 'Energie produite ce jour',
                 data: dataPuissanceMois,
                 backgroundColor: "#17b69d",
                 borderWidth: 1
@@ -108,7 +161,7 @@ function creerAffichageHistoriqueAC(data, start, end){
                 y: {
                     ticks: {
                         callback: function(value, index, ticks) {
-                            return value + ' kW';
+                            return value + ' kWh';
                         }
                     },
                     title: {
@@ -133,7 +186,7 @@ function creerAffichageHistoriqueAC(data, start, end){
                     callbacks: {
                         label: function(ctx) {
                             let dataset = ctx.dataset;
-                            return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kW"];
+                            return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kWh"];
                         }
                     }
                 }

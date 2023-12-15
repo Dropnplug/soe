@@ -38,6 +38,5 @@ def getOnduleursInfo():
     return data
 
 def getDataFromBddInBetween(start: str="1970-01-01", end: str="now"):
-    data = mysqlite.exec(f"select * from data where strftime('%s', time) > strftime('%s', ?) and strftime('%s', time) < strftime('%s', ?) order by time desc", (start, end))
-    # print(start, end)
+    data = mysqlite.exec("select * from data where strftime('%s', time) > strftime('%s', ?) and strftime('%s', time) < strftime('%s', ?) order by time desc", (start, end+" 23:59:59"))
     return formatAllData(data)

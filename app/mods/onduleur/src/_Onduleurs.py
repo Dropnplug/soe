@@ -45,10 +45,10 @@ class _Onduleurs():
         self.PING_NB_FLAG = pingNbFlag
 
     def ajouterOnduleurs(self):
-        time.sleep(10)
+        time.sleep(3)
         onduleurHardcoder = [
                 {
-                    "ip": "192.168.200.1",
+                    "ip": "192.168.100.161",
                     "port" : 6607,
                     "type" : OnduleurHuawei,
                     "slave_id" : 0,
@@ -108,7 +108,7 @@ class _Onduleurs():
     def majAllDataBdd(self):
         data = self.getAllDataTousLesOnduleurs()
         for mac_slaveId, donnee in data.items():
-            mysqlite.exec("INSERT INTO data (slave_id, puissance_dc, tension_dc, courant_dc, puissance_ac, puissance_ac_par_phase, tension_ac, tension_ac_par_phase, courant_ac, courant_ac_par_phase, frequence_ac, frequence_ac_par_phase, facteur_de_limitation_de_puissance, dephasage_cos_phi, temperature, puissance_reactive, defaut, etat, mac_onduleur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (mac_slaveId.split("_")[1], json.dumps(donnee["puissance_dc"]), json.dumps(donnee["tension_dc"]), json.dumps(donnee["courant_dc"]), donnee["puissance_ac"], "|".join(map(str, donnee["puissance_ac_par_phase"])), donnee["tension_ac"], "|".join(map(str, donnee["tension_ac_par_phase"])), donnee["courant_ac"], "|".join(map(str, donnee["courant_ac_par_phase"])), donnee["frequence_ac"], "|".join(map(str, donnee["frequence_ac_par_phase"])), donnee["facteur_de_limitation_de_puissance"], donnee["dephasage_cos_phi"], donnee["temperature"], donnee["puissance_reactive"], "|".join(map(str, donnee["defaut"])), "|".join(map(str, donnee["etat"])), mac_slaveId.split("_")[0]))
+            a = mysqlite.exec("INSERT INTO data (slave_id, puissance_dc, tension_dc, courant_dc, puissance_ac, puissance_ac_par_phase, tension_ac, tension_ac_par_phase, courant_ac, courant_ac_par_phase, frequence_ac, frequence_ac_par_phase, facteur_de_limitation_de_puissance, dephasage_cos_phi, temperature, puissance_reactive, defaut, etat, mac_onduleur, energie_totale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (mac_slaveId.split("_")[1], json.dumps(donnee["puissance_dc"]), json.dumps(donnee["tension_dc"]), json.dumps(donnee["courant_dc"]), donnee["puissance_ac"], "|".join(map("{:.1f}".format, donnee["puissance_ac_par_phase"])), donnee["tension_ac"], "|".join(map("{:.1f}".format, donnee["tension_ac_par_phase"])), donnee["courant_ac"], "|".join(map("{:.1f}".format, donnee["courant_ac_par_phase"])), donnee["frequence_ac"], "|".join(map("{:.1f}".format, donnee["frequence_ac_par_phase"])), donnee["facteur_de_limitation_de_puissance"], donnee["dephasage_cos_phi"], donnee["temperature"], donnee["puissance_reactive"], "|".join(map(str, donnee["defaut"])), "|".join(map(str, donnee["etat"])), mac_slaveId.split("_")[0], donnee["energie_totale"]))
 
     def isReady(self):
         return self.onduleurInitialise

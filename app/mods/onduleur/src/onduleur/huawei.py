@@ -152,6 +152,11 @@ REGISTRES_GET = {
         "taille":2,
         "decode":decode32UInt
     },
+    "Energie totale":{
+        "numero":32106,
+        "taille":10,
+        "decode":decode32Int
+    },
     "PV 1 Tension":{
         "numero":32016,
         "taille":1,
@@ -632,8 +637,11 @@ class OnduleurHuawei(Onduleur):
         state3 = self._get("State 3")
         return self._bitfield_decoder(state1, STATE_CODES_1) + self._bitfield_decoder(state2, STATE_CODES_2) + self._bitfield_decoder(state3, STATE_CODES_3)
 
-    def getPmax(self):
+    def getPmax(self):  # Puissance max que l'onduleur peut supporter
         return self._get("Puissance max")
+
+    def getEnerTot(self):  # Total de l'énergie produite
+        return self._get("Energie totale") * 0.01
 
     def setFactLimP(self, value):  # Modification du facteur de limitation de la puissance
         return self._set("Modification facteur de puissance", [int(value * 10)])
