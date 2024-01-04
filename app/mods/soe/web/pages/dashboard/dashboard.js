@@ -64,6 +64,8 @@ function creerAffichageHistoriqueAC(data, start, end){
     end = new Date(end)
     start.setHours(0)
     end.setHours(0)
+    let realStart = new Date(start)
+    realStart.setHours(0)
 
     // on set tous les jours à afficher à 0
     for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
@@ -89,7 +91,6 @@ function creerAffichageHistoriqueAC(data, start, end){
     for (let macOnduleur in onduleursData) {
         puissanceParJourPArOnduleur[macOnduleur] = {}
         Object.assign(puissanceParJourPArOnduleur[macOnduleur], sommePuissanceParJour)
-
         for (let donnee in onduleursData[macOnduleur]) {
             let date = new Date(onduleursData[macOnduleur][donnee]["time"])
             let jour = "0" + date.getDate()
@@ -102,97 +103,136 @@ function creerAffichageHistoriqueAC(data, start, end){
             }
         }
     }
+    
+    let dataPuissanceMois = []
+    let labelPuissanceMois = []
 
-    for (let macOnduleur in puissanceParJourPArOnduleur) {
-        for (let jour in puissanceParJourPArOnduleur[macOnduleur]) {
-            sommePuissanceParJour[jour] += puissanceParJourPArOnduleur[macOnduleur][jour]
-        }
-    }
-
-    let jourAvant = undefined
-    for (jour in sommePuissanceParJour) {
-        if (jourAvant === undefined) {
-            jourAvant = jour
-            continue
-        }
-        if (sommePuissanceParJour[jour] != 0) {
-            sommePuissanceParJour[jour] = sommePuissanceParJour[jour] - sommePuissanceParJour[jourAvant]
-        }
-        jourAvant = jour
-    }
-
-    // remplissage des liste qui vont dans le graph
-    dataPuissanceMois = []
-    labelPuissanceMois = []
-    for(jour in sommePuissanceParJour) {
-        dataPuissanceMois.push(Number(sommePuissanceParJour[jour].toFixed(2)))
-        labelPuissanceMois.push(jour)
-    }
-    // on retire le premier jour pck il vient du mois d'avant
-    dataPuissanceMois.shift()
-    labelPuissanceMois.shift()
-
-
-    // on vérifie que yai pas déjà un chart et si y en a un on update et on se casse
     let chart = Chart.getChart("canvasHistoriqueEnergie")
-    if (chart) {
-        chart.data.labels = labelPuissanceMois
-        chart.data.datasets[0].data = dataPuissanceMois
-        chart.data.datasets[0].labels = dataPuissanceMois
-        chart.update()
-        return
-    }
-
-    let canvasHisto = document.getElementById("canvasHistoriqueEnergie");
-    new Chart(canvasHisto, {
-        type: 'bar',
-        data: {
-            labels: labelPuissanceMois,
-            datasets: [{
-                label: 'Energie produite ce jour',
-                data: dataPuissanceMois,
-                backgroundColor: "#17b69d",
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value, index, ticks) {
-                            return value + ' kWh';
+    if (!chart) {
+        let canvasHisto = document.getElementById("canvasHistoriqueEnergie");
+        new Chart(canvasHisto, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Energie produite ce jour',
+                    data: [],
+                    backgroundColor: "#17b69d",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value, index, ticks) {
+                                return value + ' kWh';
+                            }
+                        },
+                        title: {
+                            color: 'black',
+                            display: true,
+                            text: 'Énergie'
                         }
                     },
-                    title: {
-                        color: 'black',
-                        display: true,
-                        text: 'Puissance'
+                    x: {
+                        title: {
+                            color: 'black',
+                            display: true,
+                            text: 'Jour'
+                        }
                     }
                 },
-                x: {
-                    title: {
-                        color: 'black',
-                        display: true,
-                        text: 'Jour'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false,
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(ctx) {
-                            let dataset = ctx.dataset;
-                            return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kWh"];
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                let dataset = ctx.dataset;
+                                return [dataset.label + " : " + dataset.data[ctx.dataIndex] + " kWh"];
+                            }
                         }
                     }
                 }
             }
+        })
+    } else {
+        for(jour in sommePuissanceParJour) {
+            dataPuissanceMois.push(Number(sommePuissanceParJour[jour].toFixed(2)))
+            labelPuissanceMois.push(jour)
         }
-    })
+        chart.data.labels = labelPuissanceMois
+        chart.data.datasets[0].data = dataPuissanceMois
+        chart.data.datasets[0].labels = dataPuissanceMois
+        chart.update()
+    }
+
+    let horloge = 0
+    for (let macOnduleur in puissanceParJourPArOnduleur) {
+        let max = 0
+        let lastEnergy = 0
+        // if (Object.keys(puissanceParJourPArOnduleur)[Object.keys(puissanceParJourPArOnduleur).length-1] == macOnduleur) {
+        //     dernierOnduleur = true
+        //     console.log("sakr")
+        // }
+        request("POST", "/soe/dashboard/LastEnergyData/", {"mac":macOnduleur.split("_")[0], "slave_id":macOnduleur.split("_")[1], "dateLimite":realStart}).then(data => {
+            if (data.length > 0) {
+                lastEnergy = data[0]["energie_totale"]
+            }
+
+            horloge += 1
+
+            max = lastEnergy
+            for (let jour in puissanceParJourPArOnduleur[macOnduleur]) {
+                // recherche de l'énergie max (fonctionne car valeur rangées par ordre chrono)
+                if (puissanceParJourPArOnduleur[macOnduleur][jour] > max) {
+                    max = puissanceParJourPArOnduleur[macOnduleur][jour]
+                }
+                
+                // si on a pas de donné le jour est à 0 par défaut
+                if (puissanceParJourPArOnduleur[macOnduleur][jour] == 0) {
+                    puissanceParJourPArOnduleur[macOnduleur][jour] = max
+                }
+                sommePuissanceParJour[jour] += puissanceParJourPArOnduleur[macOnduleur][jour]
+            }
+            
+            // si c'est le dernier tour de boucle on peut maj le graphe
+            if (horloge != Object.keys(puissanceParJourPArOnduleur).length) {
+                return
+            }
+
+            let dernirereVariation = lastEnergy
+
+            let sommePuissanceParJourVrai = {}
+            Object.assign(sommePuissanceParJourVrai, sommePuissanceParJour)
+            for (let jour in sommePuissanceParJourVrai) {
+                sommePuissanceParJour[jour] = sommePuissanceParJourVrai[jour] - dernirereVariation
+                dernirereVariation = sommePuissanceParJourVrai[jour]
+            }
+            
+            // remplissage des liste qui vont dans le graph
+            dataPuissanceMois = []
+            labelPuissanceMois = []
+            for(jour in sommePuissanceParJour) {
+                dataPuissanceMois.push(Number(sommePuissanceParJour[jour].toFixed(2)))
+                labelPuissanceMois.push(jour)
+            }
+            // on retire le premier jour pck il vient du mois d'avant
+            dataPuissanceMois.shift()
+            labelPuissanceMois.shift()
+            
+            // on vérifie que yai pas déjà un chart et si y en a un on update et on se casse
+            let chart = Chart.getChart("canvasHistoriqueEnergie")
+            chart.data.labels = labelPuissanceMois
+            chart.data.datasets[0].data = dataPuissanceMois
+            chart.data.datasets[0].labels = dataPuissanceMois
+            chart.update()
+            
+        })
+    }
 }
 
 function creerTableauEtat(dataOnduleurs, lastDataFromBdd) {
