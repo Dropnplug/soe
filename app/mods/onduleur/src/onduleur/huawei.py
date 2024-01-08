@@ -497,13 +497,16 @@ STATE_CODES_3 = {
 
 class OnduleurHuawei(Onduleur):
     def __init__(self, ip, port, slaveId:int=0, utilisateur:str=None, mdp:str=None):
+        super().__init__()
         self.utilisateur = utilisateur
         self.mdp = mdp
+        self.ip = ip
+        self.port = port
+        self.slaveID = slaveId
         try:
             self.client = asyncio.get_event_loop().run_until_complete(AsyncHuaweiSolar.create(ip, port, slaveId, timeout=1))
             self.nbPvMax = self._get("Nb pv max")
-            super().__init__()
-        except:
+        except Exception as e:
             pass
 
     def _get(self, nom, maxRe: int = 3):
@@ -576,19 +579,19 @@ class OnduleurHuawei(Onduleur):
     def getPdc(self):  # Puissance DC onduleur
         puissanceDC = {}
         for numPv in range(self.nbPvMax):
-            puissanceDC["PV " + str(numPv+1)] = (self._get("PV " + str(numPv+1) + " Courant") * 0.01) * (self._get("PV " + str(numPv+1) + " Tension") * 0.1)
+            puissanceDC["PV " + str(numPv+1)] = int((self._get("PV " + str(numPv+1) + " Courant") * 0.01) * (self._get("PV " + str(numPv+1) + " Tension") * 0.1))
         return puissanceDC
     
     def getTdc(self):  # Tension DC onduleur
         tensionDC = {}
         for numPv in range(self.nbPvMax):
-            tensionDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Tension") * 0.1
+            tensionDC["PV " + str(numPv+1)] = int(self._get("PV " + str(numPv+1) + " Tension") * 0.1)
         return tensionDC
     
     def getCdc(self):  # Courant DC onduleur
         courantDC = {}
         for numPv in range(self.nbPvMax):
-            courantDC["PV " + str(numPv+1)] = self._get("PV " + str(numPv+1) + " Courant") * 0.01
+            courantDC["PV " + str(numPv+1)] = int(self._get("PV " + str(numPv+1) + " Courant") * 0.01)
         return courantDC
     
     def getPac(self):  # Puissance AC onduleur

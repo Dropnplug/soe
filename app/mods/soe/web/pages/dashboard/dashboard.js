@@ -174,10 +174,6 @@ function creerAffichageHistoriqueAC(data, start, end){
     for (let macOnduleur in puissanceParJourPArOnduleur) {
         let max = 0
         let lastEnergy = 0
-        // if (Object.keys(puissanceParJourPArOnduleur)[Object.keys(puissanceParJourPArOnduleur).length-1] == macOnduleur) {
-        //     dernierOnduleur = true
-        //     console.log("sakr")
-        // }
         request("POST", "/soe/dashboard/LastEnergyData/", {"mac":macOnduleur.split("_")[0], "slave_id":macOnduleur.split("_")[1], "dateLimite":realStart}).then(data => {
             if (data.length > 0) {
                 lastEnergy = data[0]["energie_totale"]
@@ -252,8 +248,9 @@ function creerTableauEtat(dataOnduleurs, lastDataFromBdd) {
 
         let chaineEtat = ""
         for (let etat in listeEtat) {
-            chaineEtat += listeEtat[etat] + " "
+            chaineEtat += listeEtat[etat] + ", "
         }
+        chaineEtat = chaineEtat.substring(0, chaineEtat.length - 2)
 
         span.innerText = dataOnduleurs[donnee]["slave_id"]
         h4.innerText = dataOnduleurs[donnee]["nom"]
@@ -261,12 +258,14 @@ function creerTableauEtat(dataOnduleurs, lastDataFromBdd) {
         div.classList.add("titreEtatOnduleurs")
         divBandeau.classList.add("bandeauListe")
 
-        if (listeEtat.includes("Locked") || listeEtat.includes("Déconnecté")) {
-            divBandeau.style.background = "#dd4949"
-            span.style.background = "#dd4949"
-        } else {
-            divBandeau.style.background = "var(--main-color)"
+        let couleur = "var(--main-color)"
+        if (listeEtat.includes("Locked")) {
+            couleur = "#fc881b"
+        } else if (listeEtat.includes("Déconnecté")) {
+            couleur = "#dd4949"
         }
+        divBandeau.style.background = couleur
+        span.style.background = couleur
 
         li.classList.add("hide")
         div.appendChild(span)
@@ -284,8 +283,9 @@ function creerTableauEtat(dataOnduleurs, lastDataFromBdd) {
 
 function creerAffichageACDC(data) {
     let dcPuissance = 0
-    let dcTension = 0
     let indCouleur = 0
+    let acPuissance = 0
+    let reacPuissance = 0
     // on parcours tous les string de panneaux et on fait la sommme des puissance
     let dataPuissance = []
     let colorPuissance = []
@@ -293,22 +293,17 @@ function creerAffichageACDC(data) {
     // calcul puissance dc de tous les panneaux
     for (let onduleur in data) {
         let pvPuissance = 0
+        acPuissance = acPuissance + Number((data[onduleur]["puissance_ac"] * 0.001).toFixed(1))
+        reacPuissance = reacPuissance + data[onduleur]["puissance_reactive"]
         for (let pv in data[onduleur]["puissance_dc"]) {
-            pvPuissance = pvPuissance + data[onduleur]["puissance_dc"][pv]
-            dcPuissance = dcPuissance + data[onduleur]["puissance_dc"][pv]
+            pvPuissance = pvPuissance + Number((data[onduleur]["puissance_dc"][pv] * 0.001).toFixed(1))
+            dcPuissance = dcPuissance + Number((data[onduleur]["puissance_dc"][pv] * 0.001).toFixed(1))
         }
         dataPuissance.push(pvPuissance)
         colorPuissance.push(listeCouleur[indCouleur % listeCouleur.length])
         indCouleur = indCouleur + 1
     }
     document.getElementById("puissanceDC").innerText = dcPuissance + " kW"
-
-    let acPuissance = 0
-    let reacPuissance = 0
-    for (let onduleur in data) {
-        acPuissance = acPuissance + data[onduleur]["puissance_ac"]
-        reacPuissance = reacPuissance + data[onduleur]["puissance_reactive"]
-    }
     document.getElementById("puissanceAC").innerText = acPuissance + " kW"
     document.getElementById("puissanceReac").innerText = reacPuissance + " kW"
 
@@ -321,7 +316,7 @@ function creerAffichageACDC(data) {
         // on récupère la pmax de tous les onduleurs et on les parcours pour en faire la sommme
         let allPmax = 0
         for (let onduleur in data) {
-            allPmax = allPmax + data[onduleur]["pmax"]
+            allPmax = allPmax + Number((data[onduleur]["pmax"] * 0.001).toFixed(1))
             labelPuissance.push(data[onduleur]["nom"] + ", Slave ID : " + data[onduleur]["slave_id"])
         }
 

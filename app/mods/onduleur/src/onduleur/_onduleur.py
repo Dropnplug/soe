@@ -3,6 +3,10 @@ class Onduleur():
     def __init__(self) -> None:
         print("Initialisation d'un onduleur")
         self.pmax = self.getPmax()
+        self.actif = False
+        self.ip = None
+        self.port = None
+        self.slaveID = None
 
     def getNom(self):  # Nom de l'onduleur
         return None
