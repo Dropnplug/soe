@@ -2,7 +2,7 @@ const listeCouleur = ["chartreuse", "DarkGreen", "blue", "green", "lime", "DarkC
 const anneMinHisto = 2022
 const listeMois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
-request("GET", "/soe/dashboard/data/").then(data => {
+request("GET", "/soe/site/lastData/").then(data => {
     // création de la page à partir des données de la bdd
     creerAffichageACDC(data)
 })
@@ -53,7 +53,7 @@ function requestHistoAC() {
     start = toIsoString(start).substring(0, 10)
     end = toIsoString(end).substring(0, 10)
 
-    request("POST", "/soe/dashboard/dataHisto/", {"start":start, "end":end}).then(data => {
+    request("POST", "/soe/site/dataHisto/", {"start":start, "end":end}).then(data => {
         creerAffichageHistoriqueAC(data, start, end)
     })
 }
@@ -174,7 +174,7 @@ function creerAffichageHistoriqueAC(data, start, end){
     for (let macOnduleur in puissanceParJourPArOnduleur) {
         let max = 0
         let lastEnergy = 0
-        request("POST", "/soe/dashboard/LastEnergyData/", {"mac":macOnduleur.split("_")[0], "slave_id":macOnduleur.split("_")[1], "dateLimite":realStart}).then(data => {
+        request("POST", "/soe/onduleur/LastEnergyData/", {"mac":macOnduleur.split("_")[0], "slave_id":macOnduleur.split("_")[1], "dateLimite":realStart}).then(data => {
             if (data.length > 0) {
                 lastEnergy = data[0]["energie_totale"]
             }
@@ -309,7 +309,7 @@ function creerAffichageACDC(data) {
 
     let lastDataFromBdd = data
 
-    request("GET", "/soe/dashboard/onduleursInfo/").then(data => {
+    request("GET", "/soe/site/onduleursInfo/").then(data => {
         // création du tableau des état ici pour pas devoir faire deux requettek
         creerTableauEtat(data, lastDataFromBdd)
 

@@ -1,6 +1,12 @@
 SLEEP = 0.1
-# defaut : 600
-UPDATE_DB = 30
-# defaut : 601
+# defaut : 600 (secondes)
+UPDATE_DB = 600
+
+# Dashboard
+# defaut : 601 (secondes)
 INTERVAL_INCATIVITE = UPDATE_DB+1
 # INTERVAL_INCATIVITE = 600000000000000
+
+# Alarmes
+# defaut 10
+NOMBRE_NUPLET_ALARME = 10

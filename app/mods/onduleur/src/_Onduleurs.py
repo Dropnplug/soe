@@ -105,7 +105,7 @@ class _Onduleurs():
         # scan réseau avec dropnwifi
         # detection des onduleurs
             # on essaie de creer un objet onduleur avec le slave id
-            # si ca marche on crer un objet avec le slave id suivant
+            # si ca marche on crer un objet avec le slave id suivant et on get son SN pour savoir si on l'a déjà ou pas
         return onduleurTrouve
 
     def ajouterOnduleurs(self):
