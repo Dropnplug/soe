@@ -44,6 +44,7 @@ def getLastEnergyBeforeDate(mac, slaveID, dateLimite):
     data = mysqlite.exec("SELECT energie_totale FROM data WHERE mac_onduleur = ? and slave_id = ? and energie_totale > 0 and strftime('%s', time) < strftime('%s', ?) order by time desc LIMIT 1", (mac, slaveID, dateLimite))
     return data
 
+# Fonctions de récupération des alarmes
 def actualiserDefaut(donnee, defautTemps):
     fin = True
     listeDefaut = [str(i) for i in donnee["defaut"].split("|")]

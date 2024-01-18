@@ -4,6 +4,7 @@
 
 {% block head_soe %}
     <script type="text/javascript" src="/static/mods/soe/pages/js/alarmes/alarmes.js"></script>
+    <script type="text/javascript" src="/static/js/src/sort_table.js"></script>
     <link rel="stylesheet" href="/static/mods/soe/pages/css/alarmes/alarmes.css">
 
     <!-- <script type="text/javascript" src="/static/mods/soe/libs/Chart/Chart.js"></script> -->
@@ -17,19 +18,46 @@
 </div>
 <main>
     <div id="fondTab">
-        <table id="listeAlarmes" style="display: none;">
-            <tr>
-                <th>
-                    Nom de l'onduleur
-                </th>
-                <th>
-                    Alarme
-                </th>
-                <th>
-                    Heure de déclenchement
-                </th>
-            </tr>
-        </table>
+        <div id="pagesAlarmes" style="display: none;">
+            <table id="listeAlarmes" class="pagnination">
+                <tr>
+                    <th>
+                        Nom de l'onduleur (identifiant d'esclave)
+                    </th>
+                    <th>
+                        Alarme
+                    </th>
+                    <th>
+                        Date de déclenchement
+                    </th>
+                    <th>
+                        Date de fin
+                    </th>
+                    <th>
+                        Gravité
+                    </th>
+                </tr>
+            </table>
+            <span id="controlePages">
+                <span class="fleche" onclick="actualiserVisibiliteLignes(-1)">
+                    ←
+                </span>
+                <span id="numPageActuelle">
+                    0
+                </span>
+                <span>
+                    /
+                </span>
+                <span id="numPageTotale">
+                    0
+                </span>
+                <span class="fleche" onclick="actualiserVisibiliteLignes(1)">
+                    →
+                </span>
+                <input oninput="adjustWidth(this)" onchange="updateMaxAlarmeParPage(this)" name="itemParPage" type="number" value="5" min="1">
+                <p> / page</p>
+            </span>
+        </div>
         <span id="toutVaBien">
             <h2>
                 Aucune alarme : tout va bien.

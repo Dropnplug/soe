@@ -49,8 +49,9 @@ class _Onduleurs():
         res = False
         if self.systeme == "Windows":
             try:
-                res = check_output("ping -"+self.PING_NB_FLAG+" 1 "+ ip)
-                if res.decode("windows-1252").find("perdus = 0") != -1:
+                resu = check_output("ping -"+self.PING_NB_FLAG+" 1 "+ ip)
+                ret = resu.decode("windows-1252")
+                if ret.find("perdus = 0") != -1 and not (ret.find("Impossible de joindre") != -1):
                     res = True
             except:
                 pass
@@ -115,7 +116,10 @@ class _Onduleurs():
         # création des onduleurs et ajout à la bdd
         for onduleur in onduleurTrouve:
             # récupération de la mac address de l'onduleur à partir de son ip avec des commandes système
-            self.ping(onduleur["ip"])
+            res = self.ping(onduleur["ip"])
+            if not res:
+                print(f"L'onduleur avec cette ip : {onduleur['ip']}, ne repond pas au ping")
+                continue
             res = run(["arp", "-"+self.APR_CMD_FLAG, onduleur["ip"]], capture_output=True, text=True)
             p = re.compile(r'([0-9a-f]{2}(?:'+self.ARP_MAC_SEP+'[0-9a-f]{2}){5})', re.IGNORECASE)
             try:
