@@ -5,16 +5,11 @@
 {% block head_soe %}
     <script type="text/javascript" src="/static/mods/soe/pages/js/dashboard/dashboard.js"></script>
     <link rel="stylesheet" href="/static/mods/soe/pages/css/dashboard/dashboard.css">
-
     <script type="text/javascript" src="/static/mods/soe/libs/Chart/Chart.js"></script>
-
 {% endblock %}
 
 {% block body_soe %}
-<div style="display: flex;">
-    <div style="font-size: larger; position: absolute; width: fit-content; background-color: rgba(255, 2, 2, 0.5); border-radius: 10px;">🚧 En developpement 🚧</div>
-    <h1 style="margin: 0.5em;">Dashboard : centrale solaire photovoltaïque</h1>
-</div>
+{% include "/mods/soe/src/title.html" %}
 <main>
     <section class="etatTempsReel">
         <h3>

@@ -4,10 +4,34 @@
 
 {% block head_soe %}
     <script type="text/javascript" src="/static/mods/soe/pages/js/rapport/rapport.js"></script>
-    <script type="text/javascript" src="/static/js"></script>
     <link rel="stylesheet" href="/static/mods/soe/pages/css/rapport/rapport.css">
 {% endblock %}
 
 {% block body_soe %}
-    gros prout
+{% include "/mods/soe/src/title.html" %}
+<main>
+    <div class="multGrapgique">
+        <div class="inputs">
+            <label for="dateDebut">Date de début</label>
+            <input onchange="requestDataMultiChart()" type="date" name="dateDebut" id="inputDateDebut">
+            <label for="dateDebut">Date de fin</label>
+            <input onchange="requestDataMultiChart()" type="date" name="dateFin" id="inputDateFin">
+            <script>
+                let now = new Date()
+                now.setHours(0, 0, 0, 0)
+                let nowMoinsUnMois = new Date()
+                nowMoinsUnMois.setMonth(nowMoinsUnMois.getMonth() - 1)
+                nowMoinsUnMois.setHours(0, 0, 0, 0)
+                now.setDate(now.getDate()+1)
+                nowMoinsUnMois.setDate(nowMoinsUnMois.getDate()+1)
+
+                
+                document.getElementById("inputDateDebut").valueAsDate = nowMoinsUnMois
+                document.getElementById("inputDateFin").valueAsDate = now
+
+                requestDataMultiChart()
+            </script>
+        </div>
+    </div>
+</main>
 {% endblock %}

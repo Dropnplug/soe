@@ -1,0 +1,13 @@
+.multGrapgique {
+    display: flex;
+}
+
+.inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputs input {
+    margin: 0 1em 0 1em;
+}
