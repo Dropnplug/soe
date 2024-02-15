@@ -4,6 +4,7 @@
 
 {% block head_soe %}
     <script type="text/javascript" src="/static/mods/soe/pages/js/rapport/rapport.js"></script>
+    <script type="text/javascript" src="/static/mods/soe/libs/Chart/Chart.js"></script>
     <link rel="stylesheet" href="/static/mods/soe/pages/css/rapport/rapport.css">
 {% endblock %}
 
@@ -25,13 +26,23 @@
                 now.setDate(now.getDate()+1)
                 nowMoinsUnMois.setDate(nowMoinsUnMois.getDate()+1)
 
-                
-                document.getElementById("inputDateDebut").valueAsDate = nowMoinsUnMois
-                document.getElementById("inputDateFin").valueAsDate = now
+                if (!document.getElementById("inputDateDebut").valueAsDate) {
+                    document.getElementById("inputDateDebut").valueAsDate = nowMoinsUnMois
+                }
+                if (!document.getElementById("inputDateFin").valueAsDate) {
+                    document.getElementById("inputDateFin").valueAsDate = now
+                }
 
-                requestDataMultiChart()
+                requestDataMultiChart(premiereFois=true)
             </script>
         </div>
+        <span class="chartEtInputs">
+            <span class="inputsData">
+            </span>
+            <span class="multiChart">
+                <canvas id="canvasMultiChart"></canvas>
+            </span>
+        </span>
     </div>
 </main>
 {% endblock %}

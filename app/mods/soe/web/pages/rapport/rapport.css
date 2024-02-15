@@ -1,5 +1,12 @@
 .multGrapgique {
     display: flex;
+    flex-direction: column;
+}
+
+.multiChart {
+    width: 80%;
+    justify-content: center;
+    margin: 2em 0 2em 0;
 }
 
 .inputs {
@@ -10,4 +17,53 @@
 
 .inputs input {
     margin: 0 1em 0 1em;
+}
+
+.chartEtInputs {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+}
+
+.inputsData {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid grey;
+    border-radius: 10px;
+    max-height: 80vh;
+    overflow: scroll;
+}
+
+.inputsData details {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputsData label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow-wrap: anywhere;
+    padding: 0.5em;
+}
+
+.inputsData label:hover {
+    background-color: lightgrey;
+    border-radius: 2px;
+}
+
+.inputsData input {
+    margin: 0 2em 0 1em;
+    min-width: fit-content;
+}
+
+.inputsData details summary input {
+    margin: 0 0 0 1em;
+}
+
+.inputsData h2 {
+    width: auto;
 }
