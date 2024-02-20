@@ -162,35 +162,126 @@ function creerInputs(onduleursData) {
     }
 }
 
+function initGraph(nomCanvas) {
+    let chart = Chart.getChart(nomCanvas)
+    if (!chart) {
+        let canvasMultiChart = document.getElementById(nomCanvas)
+        new Chart(canvasMultiChart, {
+            data: {
+                // générer les dataset en fonction des input coché par le user
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Bar Dataset',
+                        // couleur en fonction d'une liste de couleur avec une version plus clair de  chaque couleur pour les lignes du chart
+                        yAxisID: 'Primaire',
+                        backgroundColor: "#C8DBFE",
+                        borderColor: "green",
+                        // en fonction du type de graphique les lines doivent être au dessus
+                        order: 2,
+                        data: [5700, 6300, 8200]
+                    },
+                    {
+                        type: 'line',
+                        label: 'Bar Dataset',
+                        yAxisID: 'Secondaire',
+                        backgroundColor: "#ccffcc",
+                        borderColor: "green",
+                        order: 1,
+                        data: [11, 3.6, 7.3, 8.1]
+                    }
+                ],
+                // en fonction du temps choisis par le user et donc à update souvent
+                labels: [1, 2, 3, 4, 5, 6]
+            },
+            options: {
+                responsive: true,
+                // plugins: {
+                //     legend: {
+                //         display: false,
+                //     }
+                // },
+                scales: {
+                    Primaire: {
+                        type: 'linear',
+                        position: 'left',
+                        ticks: { beginAtZero: true, color: 'blue' },
+                        grid: {
+                            color: function(context) {
+                                return '#C8DBFE';
+                            },
+                        },
+                    },
+                    Secondaire: {
+                        type: 'linear',
+                        position: 'right',
+                        ticks: { beginAtZero: true, color: '#0c5b4f' },
+                        grid: {
+                            color: function(context) {
+                                return '#a1dbcd';
+                            },
+                        },
+                    }
+                }
+            }
+        })
+
+        // new Chart(canvasMultiChart, {
+        //     type: 'line',
+        //     data: {
+        //     labels: ['Friday', 'Saturday', 'Sunday', 'Monday'],
+        //     datasets: [
+        //         {
+        //         yAxisID: 'A', // <-- the Y axis to use for this data set
+        //         label: 'Page Views',
+        //         data: [13500, 5700, 6300, 8200],
+        //         borderWidth: 1,
+        //         // backgroundColor: 'blue',
+        //         borderColor: 'blue'
+        //         },
+        //         {
+        //         yAxisID: 'B', // <-- the Y axis to use for this data set
+        //         label: 'Revenue',
+        //         data: [11, 3.6, 7.3, 8.1],
+        //         // backgroundColor: 'green',
+        //         borderColor: 'green'
+        //         }
+        //     ]
+        //     },
+        //     options: {
+        //     responsive: true,
+        //     scales: {
+        //         A: {
+        //         type: 'linear',
+        //         position: 'left',
+        //         ticks: { beginAtZero: true, color: 'blue' },
+        //         // Hide grid lines, otherwise you have separate grid lines for the 2 y axes
+        //         grid: { display: false }
+        //         },
+        //         B: {
+        //         type: 'linear',
+        //         position: 'right',
+        //         ticks: { beginAtZero: true, color: 'green' },
+        //         grid: { display: false }
+        //         },
+        //         x: { ticks: { beginAtZero: true } }
+        //     }
+        //     }
+        // });
+    } else {
+        chart.update()
+    }
+}
+
 function creerMultiChart(data, start, end) {
     let onduleursData = repartirDonneesParOnudleurs(data)
     creerInputs(onduleursData)
 
     // update l'abscice donc le temps pck cette fonction est appellée à chaque changement de delta temps
+    
 
     // resolve les inputs qui sont checkés pour qu'ils se raclculent
 
-    let chart = Chart.getChart("canvasMultiChart")
-    if (!chart) {
-        let canvasMultiChart = document.getElementById("canvasMultiChart")
-        new Chart(canvasMultiChart, {
-            data: {
-                datasets: [{
-                    type: 'bar',
-                    label: 'Bar Dataset',
-                    data: []
-                }],
-                labels: []
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                }
-            }
-        })
-    } else {
-        chart.update()
-    }
+
+    initGraph("canvasMultiChart")
 }

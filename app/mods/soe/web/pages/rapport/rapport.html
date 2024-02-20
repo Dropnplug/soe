@@ -9,7 +9,10 @@
 {% endblock %}
 
 {% block body_soe %}
-{% include "/mods/soe/src/title.html" %}
+{% with nomPage="Graphique / Rapport" %}
+    {% include "/mods/soe/src/title.html" %}
+{% endwith %}
+<!-- {% include "/mods/soe/src/title.html" %} -->
 <main>
     <div class="multGrapgique">
         <div class="inputs">
