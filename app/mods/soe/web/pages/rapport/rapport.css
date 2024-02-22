@@ -15,7 +15,7 @@
     justify-content: center;
 }
 
-.inputs input {
+.inputs input, .inputs select {
     margin: 0 1em 0 1em;
 }
 

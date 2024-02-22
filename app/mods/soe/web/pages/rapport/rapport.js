@@ -1,31 +1,32 @@
+// TODO les fonctions des data doivent toutes retournée une liste de données affichable par le chart avec le bon interval de temps
 const listeData = {
     "Puissance DC": (data) => {console.log(data)},
-    "Tension DC": (event) => {console.log(event)},
-    "Courant DC": (event) => {console.log(event)},
-    "Puissance AC ": (event) => {console.log(event)},
-    "Puissance AC L1": (event) => {console.log(event)},
-    "Puissance AC L2": (event) => {console.log(event)},
-    "Puissance AC L3": (event) => {console.log(event)},
-    "Tension AC": (event) => {console.log(event)},
-    "Tension AC L1": (event) => {console.log(event)},
-    "Tension AC L2": (event) => {console.log(event)},
-    "Tension AC L3": (event) => {console.log(event)},
-    "Courant AC": (event) => {console.log(event)},
-    "Courant AC L1": (event) => {console.log(event)},
-    "Courant AC L2": (event) => {console.log(event)},
-    "Courant AC L3": (event) => {console.log(event)},
-    "Fréquence AC": (event) => {console.log(event)},
-    "Fréquence AC L1": (event) => {console.log(event)},
-    "Fréquence AC L2": (event) => {console.log(event)},
-    "Fréquence AC L3": (event) => {console.log(event)},
-    "Facteur de limitation de puissance": (event) => {console.log(event)},
-    "Déphasage cos phi": (event) => {console.log(event)},
-    "Température": (event) => {console.log(event)},
-    "Puissance réactive": (event) => {console.log(event)},
-    "Énergie": (event) => {console.log(event)},
+    "Tension DC": (data) => {console.log(data)},
+    "Courant DC": (data) => {console.log(data)},
+    "Puissance AC ": (data) => {console.log(data)},
+    "Puissance AC L1": (data) => {console.log(data)},
+    "Puissance AC L2": (data) => {console.log(data)},
+    "Puissance AC L3": (data) => {console.log(data)},
+    "Tension AC": (data) => {console.log(data)},
+    "Tension AC L1": (data) => {console.log(data)},
+    "Tension AC L2": (data) => {console.log(data)},
+    "Tension AC L3": (data) => {console.log(data)},
+    "Courant AC": (data) => {console.log(data)},
+    "Courant AC L1": (data) => {console.log(data)},
+    "Courant AC L2": (data) => {console.log(data)},
+    "Courant AC L3": (data) => {console.log(data)},
+    "Fréquence AC": (data) => {console.log(data)},
+    "Fréquence AC L1": (data) => {console.log(data)},
+    "Fréquence AC L2": (data) => {console.log(data)},
+    "Fréquence AC L3": (data) => {console.log(data)},
+    "Facteur de limitation de puissance": (data) => {console.log(data)},
+    "Déphasage cos phi": (data) => {console.log(data)},
+    "Température": (data) => {console.log(data)},
+    "Puissance réactive": (data) => {console.log(data)},
+    "Énergie": (data) => {console.log(data)},
 }
 
-function requestDataMultiChart(premiereFois=false) {
+function requestDataMultiChart(event, premiereFois=false) {
     // recup value des inputs
     let inputDateDebut = document.getElementById("inputDateDebut")
     let inputDateFin = document.getElementById("inputDateFin")
@@ -53,9 +54,13 @@ function requestDataMultiChart(premiereFois=false) {
     // on retire les millisecondes
     start = Math.floor(start / 1000)
     end = Math.floor(end / 1000)
+    if (start > end) {
+        console.log("erreur, la date de début est supérieur a la date de fin")
+        return
+    }
 
     request("POST", "/soe/site/getDataFromBdd/", {"start": start, "end": end}).then(data => {
-        creerMultiChart(data, start, end)
+        creerMultiChart(data, start, end, event)
     })
 }
 
@@ -162,22 +167,31 @@ function creerInputs(onduleursData) {
     }
 }
 
-function initGraph(nomCanvas) {
+// TODO fonction qui est appelée quand on clique sur une checkbox de details pour ajouter ou éffacer des datasets du graphique
+function invertDrawedState() {
+    // TODO appeler les fonctions qui retourne les data
+}
+
+function initOrUpdateGraph(nomCanvas, tableauAbscisse, listeDatasets) {
+    // génération des datasets
+    // TODO lors de la génération des datasets il faut ajouter un champs custom qui sert à identifier le dataset 
+
     let chart = Chart.getChart(nomCanvas)
     if (!chart) {
         let canvasMultiChart = document.getElementById(nomCanvas)
         new Chart(canvasMultiChart, {
             data: {
-                // générer les dataset en fonction des input coché par le user
+                // TODO générer les dataset en fonction des input coché par le user
                 datasets: [
                     {
                         type: 'bar',
+                        // TODO ça doit être le nom et l'id de l'onduleur ou bien le site
                         label: 'Bar Dataset',
-                        // couleur en fonction d'une liste de couleur avec une version plus clair de  chaque couleur pour les lignes du chart
+                        // TODO couleur en fonction d'une liste de couleur avec une version plus clair de  chaque couleur pour les lignes du chart
                         yAxisID: 'Primaire',
                         backgroundColor: "#C8DBFE",
                         borderColor: "green",
-                        // en fonction du type de graphique les lines doivent être au dessus
+                        // TODO en fonction du type de graphique les lines doivent être au dessus
                         order: 2,
                         data: [5700, 6300, 8200]
                     },
@@ -188,11 +202,11 @@ function initGraph(nomCanvas) {
                         backgroundColor: "#ccffcc",
                         borderColor: "green",
                         order: 1,
+                        cubicInterpolationMode: "monotone",
                         data: [11, 3.6, 7.3, 8.1]
                     }
                 ],
-                // en fonction du temps choisis par le user et donc à update souvent
-                labels: [1, 2, 3, 4, 5, 6]
+                labels: tableauAbscisse
             },
             options: {
                 responsive: true,
@@ -212,6 +226,7 @@ function initGraph(nomCanvas) {
                             },
                         },
                     },
+                    // TODO enlever cet axe quand on en a pas besoins
                     Secondaire: {
                         type: 'linear',
                         position: 'right',
@@ -225,63 +240,107 @@ function initGraph(nomCanvas) {
                 }
             }
         })
-
-        // new Chart(canvasMultiChart, {
-        //     type: 'line',
-        //     data: {
-        //     labels: ['Friday', 'Saturday', 'Sunday', 'Monday'],
-        //     datasets: [
-        //         {
-        //         yAxisID: 'A', // <-- the Y axis to use for this data set
-        //         label: 'Page Views',
-        //         data: [13500, 5700, 6300, 8200],
-        //         borderWidth: 1,
-        //         // backgroundColor: 'blue',
-        //         borderColor: 'blue'
-        //         },
-        //         {
-        //         yAxisID: 'B', // <-- the Y axis to use for this data set
-        //         label: 'Revenue',
-        //         data: [11, 3.6, 7.3, 8.1],
-        //         // backgroundColor: 'green',
-        //         borderColor: 'green'
-        //         }
-        //     ]
-        //     },
-        //     options: {
-        //     responsive: true,
-        //     scales: {
-        //         A: {
-        //         type: 'linear',
-        //         position: 'left',
-        //         ticks: { beginAtZero: true, color: 'blue' },
-        //         // Hide grid lines, otherwise you have separate grid lines for the 2 y axes
-        //         grid: { display: false }
-        //         },
-        //         B: {
-        //         type: 'linear',
-        //         position: 'right',
-        //         ticks: { beginAtZero: true, color: 'green' },
-        //         grid: { display: false }
-        //         },
-        //         x: { ticks: { beginAtZero: true } }
-        //     }
-        //     }
-        // });
     } else {
+        // TODO modifier les data, labels, couleur, type axes
+        chart.data.labels = tableauAbscisse
         chart.update()
     }
 }
 
-function creerMultiChart(data, start, end) {
+function genAbscisse(start, end) {
+    // choix du pas en fonction de la taille de l'interval et de l'input user
+    let intervalTimeStamp = end - start
+    let maxCol = 62
+    let tablePas = {
+        heure: 3600,
+        jour: 24 * 3600,
+        mois: 24 * 3600 * 31,
+        annee: 24 * 3600 * 31 * 12
+    }
+    
+    let pas = ""
+    let inputPas = document.getElementById("pas")
+    if (intervalTimeStamp / tablePas[inputPas.value] > maxCol) {
+        console.log("erreur, prendre un interval plus petit")
+    } else {
+        pas = inputPas.value
+    }
+
+    if (pas == "") {
+        if (intervalTimeStamp < 2*tablePas.jour) {
+            pas = "heure"
+        } else if (intervalTimeStamp < 2*tablePas.mois) {
+            pas = "jour"
+        } else if (intervalTimeStamp < 2*tablePas.annee) {
+            pas = "mois"
+        } else {
+            pas = "annee"
+        }
+    }
+    inputPas.value = pas
+
+    let chaineAPush = undefined
+    let tableauAbscisse = []
+    let debut = new Date(start*1000)
+    let fin = new Date(end*1000)
+    let date = debut
+    let premierTour = true
+    while (date <= fin) {
+        let jour = "0" + date.getDate()
+        jour = jour.substring(jour.length - 2)
+        let mois = "0" + Number(date.getMonth() + 1)
+        mois = mois.substring(mois.length - 2)
+        let annee = date.getFullYear()
+        
+        chaineAPush = ""
+        if (pas == "heure") {
+            let heure = "0" + Number(date.getHours())
+            heure = heure.substring(heure.length - 2)
+            let min = "0" + Number(date.getMinutes())
+            min = min.substring(min.length - 2)
+
+            chaineAPush = [jour + "/" + mois, " " +heure + ":" + min]
+            date.setHours(date.getHours()+1)
+        } else if (pas == "jour") {
+            chaineAPush = jour + "/" + mois
+            date.setDate(date.getDate()+1)
+        } else if (pas == "mois") {
+            chaineAPush = mois + " / " + annee
+            date.setMonth(date.getMonth()+1)
+            if (premierTour) {
+                fin.setMonth(fin.getMonth()+1)
+                fin.setDate(0)
+                premierTour = false
+            }
+        } else {
+            chaineAPush = annee
+            date.setFullYear(date.getFullYear()+1)
+            if (premierTour) {
+                fin.setFullYear(fin.getFullYear(), 11, 31)
+                premierTour = false
+            }
+        }
+        tableauAbscisse.push(chaineAPush)
+    }
+    return tableauAbscisse
+}
+
+function genListeDatas(start, end) {
+    
+}
+
+function creerMultiChart(data, start, end, event) {
     let onduleursData = repartirDonneesParOnudleurs(data)
+
+    // création et mise à jour des checkbox d'affichage de données
     creerInputs(onduleursData)
 
     // update l'abscice donc le temps pck cette fonction est appellée à chaque changement de delta temps
-    
+    let tableauAbscisse = genAbscisse(start, end)
 
-    // resolve les inputs qui sont checkés pour qu'ils se raclculent
+    // TODO resolve les inputs qui sont checkés pour qu'ils se raclculent
+    let listeDatasets = []
 
-
-    initGraph("canvasMultiChart")
+    // initialistaion ou mise à jour du chart avec les nouveaux datasets et interval de temps
+    initOrUpdateGraph("canvasMultiChart", tableauAbscisse, listeDatasets)
 }

@@ -17,9 +17,16 @@
     <div class="multGrapgique">
         <div class="inputs">
             <label for="dateDebut">Date de début</label>
-            <input onchange="requestDataMultiChart()" type="date" name="dateDebut" id="inputDateDebut">
+            <input onchange="requestDataMultiChart(event)" type="date" name="dateDebut" id="inputDateDebut">
             <label for="dateDebut">Date de fin</label>
-            <input onchange="requestDataMultiChart()" type="date" name="dateFin" id="inputDateFin">
+            <input onchange="requestDataMultiChart(event)" type="date" name="dateFin" id="inputDateFin">
+            <label for="pas">Pas</label>
+            <select onchange="requestDataMultiChart(event)" name="pas" id="pas">
+                <option value="heure">Heure</option>
+                <option value="jour">Jour</option>
+                <option value="mois">Mois</option>
+                <option value="annee">Année</option>
+            </select>
             <script>
                 let now = new Date()
                 now.setHours(0, 0, 0, 0)
