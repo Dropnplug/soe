@@ -1,29 +1,137 @@
+const tablePas = {
+    heure: 3600,
+    jour: 24 * 3600,
+    mois: 24 * 3600 * 31,
+    annee: 24 * 3600 * 31 * 12
+}
+
+const variationCouleur = 2
+
+var checkboxChecked = []
+var checkboxMasterUnchecked = []
+var detailsOpen = []
+
 // TODO les fonctions des data doivent toutes retournée une liste de données affichable par le chart avec le bon interval de temps
 const listeData = {
-    "Puissance DC": (data) => {console.log(data)},
-    "Tension DC": (data) => {console.log(data)},
-    "Courant DC": (data) => {console.log(data)},
-    "Puissance AC ": (data) => {console.log(data)},
-    "Puissance AC L1": (data) => {console.log(data)},
-    "Puissance AC L2": (data) => {console.log(data)},
-    "Puissance AC L3": (data) => {console.log(data)},
-    "Tension AC": (data) => {console.log(data)},
-    "Tension AC L1": (data) => {console.log(data)},
-    "Tension AC L2": (data) => {console.log(data)},
-    "Tension AC L3": (data) => {console.log(data)},
-    "Courant AC": (data) => {console.log(data)},
-    "Courant AC L1": (data) => {console.log(data)},
-    "Courant AC L2": (data) => {console.log(data)},
-    "Courant AC L3": (data) => {console.log(data)},
-    "Fréquence AC": (data) => {console.log(data)},
-    "Fréquence AC L1": (data) => {console.log(data)},
-    "Fréquence AC L2": (data) => {console.log(data)},
-    "Fréquence AC L3": (data) => {console.log(data)},
-    "Facteur de limitation de puissance": (data) => {console.log(data)},
-    "Déphasage cos phi": (data) => {console.log(data)},
-    "Température": (data) => {console.log(data)},
-    "Puissance réactive": (data) => {console.log(data)},
-    "Énergie": (data) => {console.log(data)},
+    "Puissance DC": (data, start, end, pas, checkboxId, label) => {
+        let donnees = []
+        let debut = new Date(start*1000)
+        
+        let indCol = 0
+        for (let macOnduleur in data) {
+            indCol = 0
+            let dateAvant = undefined
+            let dateActuelle = undefined
+            let reverseData = Object.keys(data[macOnduleur]).reverse()
+            let nombreDeData = 0
+            for (let indice in reverseData) {
+                nombreDeData += 1
+                if (dateAvant == undefined) {
+                    dateAvant = debut
+                }
+                dateActuelle = new Date(data[macOnduleur][reverseData[indice]]["time"])
+                let difference = getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
+                if (difference != 0) {
+                    if (donnees[indCol] != undefined) {
+                        donnees[indCol] = Math.round((donnees[indCol]/nombreDeData)/1000)
+                    }
+                    nombreDeData = 0
+                    indCol += difference
+                }
+                dateAvant = new Date(data[macOnduleur][reverseData[indice]]["time"])
+                for (let pvString in data[macOnduleur][reverseData[indice]]["puissance_dc"]) {
+                    if (donnees[indCol] == undefined) {
+                        donnees[indCol] = 0
+                    }
+                    donnees[indCol] += Number(data[macOnduleur][reverseData[indice]]["puissance_dc"][pvString])
+                }
+            }
+        }
+
+        datasetAajouter = {
+                data: donnees,
+                unit:"kw",
+                id: checkboxId,
+                label: "Puissance DC" + " " + label
+            }
+        
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Tension DC": (data, start, end, pas, checkboxId, label) => {
+        datasetAajouter = {
+            data: [100],
+            unit:"V",
+            id: checkboxId,
+            label: "Tension DC" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Courant DC": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Puissance AC ": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Puissance AC L1": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Puissance AC L2": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Puissance AC L3": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Tension AC": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Tension AC L1": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Tension AC L2": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Tension AC L3": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Courant AC": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Courant AC L1": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Courant AC L2": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Courant AC L3": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Fréquence AC": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Fréquence AC L1": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Fréquence AC L2": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Fréquence AC L3": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Facteur de limitation de puissance": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Déphasage cos phi": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Température": (data, start, end, pas, checkboxId, label) => {
+        let donnees = []
+        let debut = new Date(start*1000)
+        
+        let indCol = 0
+        for (let macOnduleur in data) {
+            indCol = 0
+            let dateAvant = undefined
+            let dateActuelle = undefined
+            let reverseData = Object.keys(data[macOnduleur]).reverse()
+            let nombreDeData = 0
+            for (let indice in reverseData) {
+                nombreDeData += 1
+                if (dateAvant == undefined) {
+                    dateAvant = debut
+                }
+                dateActuelle = new Date(data[macOnduleur][reverseData[indice]]["time"])
+                let difference = getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
+                if (difference != 0) {
+                    if (donnees[indCol] != undefined) {
+                        donnees[indCol] = Math.round((donnees[indCol]/nombreDeData)/1000)
+                    }
+                    nombreDeData = 0
+                    indCol += difference
+                }
+                dateAvant = new Date(data[macOnduleur][reverseData[indice]]["time"])
+                for (let pvString in data[macOnduleur][reverseData[indice]]["puissance_dc"]) {
+                    if (donnees[indCol] == undefined) {
+                        donnees[indCol] = 0
+                    }
+                    donnees[indCol] += Number(data[macOnduleur][reverseData[indice]]["puissance_dc"][pvString])
+                }
+            }
+        }
+
+        datasetAajouter = {
+                data: donnees,
+                unit:"°C",
+                id: checkboxId,
+                label: "Température" + " " + label
+            }
+        
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Puissance réactive": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Énergie": (data, start, end, pas) => {console.log(data, start, end, pas)},
 }
 
 function requestDataMultiChart(event, premiereFois=false) {
@@ -64,6 +172,33 @@ function requestDataMultiChart(event, premiereFois=false) {
     })
 }
 
+function getPasDifferenceEntreDate(dateAvant, dateActuelle, pas) {
+    // soustraire les dates sur le pas
+    let difference = 0
+    switch (pas) {
+        case "heure":
+            dateAvant = dateAvant.getTime() / 1000
+            dateActuelle = dateActuelle.getTime() / 1000
+            difference = Math.round(Math.abs(dateActuelle - dateAvant) / 3600)
+            break;
+        case "jour":
+            dateAvant = dateAvant.getTime() / 1000
+            dateActuelle = dateActuelle.getTime() / 1000
+            difference = Math.round(Math.abs((dateAvant - dateActuelle) / tablePas.jour))
+            break;
+        case "mois":
+            difference = dateActuelle.getMonth() - dateAvant.getMonth() + (12 * (dateActuelle.getFullYear() - dateAvant.getFullYear()))
+            break;
+        case "annee":
+            difference = dateActuelle.getFullYear() - dateAvant.getFullYear()
+            break;
+    
+        default:
+            break;
+    }
+    return difference
+}
+
 function repartirDonneesParOnudleurs(data) {
     let onduleursData = {}
     for (donnee in data) {
@@ -78,13 +213,33 @@ function repartirDonneesParOnudleurs(data) {
 function checkCheckbox(details) {
         let elems = details.getElementsByTagName("input")
         elems = [...elems]
-        elems.shift()
+        let masterCheckbox = elems.shift()
+        
+        if (masterCheckbox.checked == false) {
+            if (!checkboxMasterUnchecked.includes(masterCheckbox.id)) {
+                checkboxMasterUnchecked.push(masterCheckbox.id)
+            }
+        } else {
+            let index = checkboxMasterUnchecked.indexOf(masterCheckbox.id)
+            if (index > -1) {
+                checkboxMasterUnchecked.splice(index, 1)
+            }
+        }
+
         for (let elem in elems) {
             elems[elem].disabled = !elems[elem].disabled
+            if (elems[elem].disabled == false && elems[elem].checked) {
+                // deux appels pour décocher puis recocher et fire l'envent onchange
+                elems[elem].click()
+                elems[elem].click()
+            } else {
+                supprimerDatasetsFromChart("canvasMultiChart", elems[elem].id)
+            }
         }
 }
 
-function creerInputs(onduleursData) {
+// TODO découper cette fonction en sous fonction pour pas dupliquer le code
+function creerInputs(onduleursData, start, end, pas, tableauAbscisse) {
     let spanInputs = document.getElementsByClassName("inputsData")[0]
     spanInputs.innerHTML = ""
     const nomSite = "Site"
@@ -97,17 +252,30 @@ function creerInputs(onduleursData) {
         let checkbox = document.createElement("input")
         label.setAttribute("for", nomSite)
         label.innerText = nomSite
+        detail.id = "detail_"+nomSite
+        detail.ontoggle = () => {
+            if (detail.open) {
+                detailsOpen.push(detail.id)
+            } else {
+                let index = detailsOpen.indexOf(detail.id)
+                if (index > -1) {
+                    detailsOpen.splice(index, 1)
+                }
+            }
+        }
         checkbox.onchange = () => checkCheckbox(detail)
         checkbox.id = nomSite
         checkbox.style.transform = "scale(1.3)"
         checkbox.type = "checkbox"
         checkbox.checked = true
+        let checkboxMaster = checkbox
         summary.innerText = nomSite
         summary.style.fontSize = "1.2em"
     
         label.appendChild(checkbox)
         summary.appendChild(label)
         detail.appendChild(summary)
+
         for (let data in listeData) {
             let checkbox = document.createElement("input")
             let label = document.createElement("label")
@@ -116,11 +284,36 @@ function creerInputs(onduleursData) {
             checkbox.type = "checkbox"
             checkbox.name = data
             checkbox.id = data
-            checkbox.onclick = () => listeData[data](onduleursData)
+            checkbox.onchange = () => {
+                if (checkbox.checked) {
+                    // appelle à la bonne fonction grâce au nom de la donnée
+                    if (!checkboxChecked.includes(checkbox.id)) {
+                        checkboxChecked.push(checkbox.id)
+                    }
+                    listeData[data](onduleursData, start, end, pas, checkbox.id, nomSite)
+                } else {
+                    supprimerDatasetsFromChart("canvasMultiChart", checkbox.id)
+                    let index = checkboxChecked.indexOf(checkbox.id)
+                    if (index > -1) {
+                        checkboxChecked.splice(index, 1)
+                    }
+                }
+            }
             label.appendChild(checkbox)
             detail.appendChild(label)
+            if (checkboxChecked.includes(checkbox.id)) {
+                checkbox.click()
+            }
         }
         spanInputs.appendChild(detail)
+        
+        if (checkboxMasterUnchecked.includes(checkboxMaster.id)) {
+            checkboxMaster.click()
+        }
+
+        if (detailsOpen.includes(detail.id)) {
+            detail.open = true
+        }
     } else {
         let h2 = document.createElement("h2")
         h2.innerText = "Pas de données pour la période sélèctionnée."
@@ -135,6 +328,17 @@ function creerInputs(onduleursData) {
         let checkbox = document.createElement("input")
         let span = document.createElement("span")
 
+        detail.id = "detail_"+macOnduleur
+        detail.ontoggle = () => {
+            if (detail.open) {
+                detailsOpen.push(detail.id)
+            } else {
+                let index = detailsOpen.indexOf(detail.id)
+                if (index > -1) {
+                    detailsOpen.splice(index, 1)
+                }
+            }
+        }
         span.classList.add("spanLabelInput")
         label.setAttribute("for", macOnduleur)
         label.innerText = macOnduleur
@@ -143,78 +347,161 @@ function creerInputs(onduleursData) {
         checkbox.style.transform = "scale(1.3)"
         checkbox.type = "checkbox"
         checkbox.checked = true
+        let checkboxMaster = checkbox
         summary.innerText = "Onduleur"
         summary.style.fontSize = "1.2em"
 
         label.appendChild(checkbox)
         summary.appendChild(label)
         detail.appendChild(summary)
+
+        if (checkboxChecked.includes(checkbox.id)) {
+            checkbox.click()
+        }
         
         // un onduleur
         for (let data in listeData) {
             let checkbox = document.createElement("input")
             let label = document.createElement("label")
+            // TODO trouver le nom de l'onduleur
             label.innerText = data
             label.setAttribute("for", macOnduleur + "_" + data)
             checkbox.type = "checkbox"
             checkbox.name = data
             checkbox.id = macOnduleur + "_" + data
-            checkbox.onclick = () => listeData[data](onduleursData[macOnduleur])
+            checkbox.onchange = () => {
+                if (checkbox.checked) {
+                    let object = {}
+                    object[macOnduleur] = onduleursData[macOnduleur]
+                    // appelle à la bonne fonction grâce au nom de la donnée
+                    if (!checkboxChecked.includes(checkbox.id)) {
+                        checkboxChecked.push(checkbox.id)
+                    }
+                    listeData[data](object, start, end, pas, checkbox.id, macOnduleur)
+                } else {
+                    supprimerDatasetsFromChart("canvasMultiChart", checkbox.id)
+                    let index = checkboxChecked.indexOf(checkbox.id)
+                    if (index > -1) {
+                        checkboxChecked.splice(index, 1)
+                    }
+                }
+            }
             label.appendChild(checkbox)
             detail.appendChild(label)
+            if (checkboxChecked.includes(checkbox.id)) {
+                checkbox.click()
+            }
         }
         spanInputs.appendChild(detail)
+        if (checkboxMasterUnchecked.includes(checkboxMaster.id)) {
+            checkboxMaster.click()
+        }
+        if (detailsOpen.includes(detail.id)) {
+            detail.open = true
+        }
     }
 }
 
-// TODO fonction qui est appelée quand on clique sur une checkbox de details pour ajouter ou éffacer des datasets du graphique
-function invertDrawedState() {
-    // TODO appeler les fonctions qui retourne les data
+function shadeColor(color, percent) {
+    var R = parseInt(color.substring(1,3),16);
+    var G = parseInt(color.substring(3,5),16);
+    var B = parseInt(color.substring(5,7),16);
+
+    R = parseInt((R + percent)%255);
+    G = parseInt((G + percent)%255);
+    B = parseInt((B + percent)%255);
+    console.log(R, G, B)
+
+    R = (R<255)?R:255;
+    G = (G<255)?G:255;
+    B = (B<255)?B:255;
+
+    R = Math.round(R)
+    G = Math.round(G)
+    B = Math.round(B)
+
+    var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+    var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+    var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
 }
 
-function initOrUpdateGraph(nomCanvas, tableauAbscisse, listeDatasets) {
-    // génération des datasets
-    // TODO lors de la génération des datasets il faut ajouter un champs custom qui sert à identifier le dataset 
+function addOrRemoveAxeSecondaire(nomCanvas) {
+    let chart = Chart.getChart(nomCanvas)
+    let units = {}
+    
+    let trouve = false
+    let i = 0
+    while (!trouve && i < chart.data.datasets.length) {
+        units[chart.data.datasets[i].unit] = 1
+        if (Object.keys(units).length > 1) {
+            trouve = true
+        }
+        i += 1
+    }
 
+    if (trouve) {
+        chart.options.scales["Secondaire"] = {
+            type: 'linear',
+            position: 'right',
+            ticks: { beginAtZero: true, color: '#0c5b4f' },
+            grid: {
+                color: function(context) {
+                    return '#a1dbcd'
+                }
+            }
+        }
+    } else {
+        if (chart.options.scales["Secondaire"] != undefined) {
+            delete chart.options.scales["Secondaire"]
+        }
+    }
+
+    chart.update()
+}
+
+function supprimerDatasetsFromChart(nomCanvas, idDataset) {
+    let chart = Chart.getChart(nomCanvas)
+    
+    let trouve = false
+    let i = 0
+    while (!trouve && i < chart.data.datasets.length) {
+        if (chart.data.datasets[i].id == idDataset) {
+            // chart.data.units[chart.data.datasets[i].unit].backgroundColor = shadeColor(chart.data.units[chart.data.datasets[i].unit].backgroundColor, variationCouleur)
+            // chart.data.units[chart.data.datasets[i].unit].borderColor = shadeColor(chart.data.units[chart.data.datasets[i].unit].borderColor, variationCouleur)
+            // chart.data.units[chart.data.datasets[i].unit]["nombre"] += 1
+            chart.data.datasets.splice(i, 1)
+            trouve = true
+        }
+        i += 1
+    }
+
+    if (trouve) {
+        addOrRemoveAxeSecondaire("canvasMultiChart")
+        chart.update()
+    }
+}
+
+function supprimerTousLesDatasets(nomCanvas) {
+    let chart = Chart.getChart(nomCanvas)
+    chart.data.datasets = []
+    addOrRemoveAxeSecondaire("canvasMultiChart")
+    chart.update()
+}
+
+function initOrUpdateGraph(nomCanvas, tableauAbscisse=undefined, datasetAajouter) {
     let chart = Chart.getChart(nomCanvas)
     if (!chart) {
         let canvasMultiChart = document.getElementById(nomCanvas)
         new Chart(canvasMultiChart, {
             data: {
-                // TODO générer les dataset en fonction des input coché par le user
-                datasets: [
-                    {
-                        type: 'bar',
-                        // TODO ça doit être le nom et l'id de l'onduleur ou bien le site
-                        label: 'Bar Dataset',
-                        // TODO couleur en fonction d'une liste de couleur avec une version plus clair de  chaque couleur pour les lignes du chart
-                        yAxisID: 'Primaire',
-                        backgroundColor: "#C8DBFE",
-                        borderColor: "green",
-                        // TODO en fonction du type de graphique les lines doivent être au dessus
-                        order: 2,
-                        data: [5700, 6300, 8200]
-                    },
-                    {
-                        type: 'line',
-                        label: 'Bar Dataset',
-                        yAxisID: 'Secondaire',
-                        backgroundColor: "#ccffcc",
-                        borderColor: "green",
-                        order: 1,
-                        cubicInterpolationMode: "monotone",
-                        data: [11, 3.6, 7.3, 8.1]
-                    }
-                ],
+                units: {},
+                datasets: [],
                 labels: tableauAbscisse
             },
             options: {
                 responsive: true,
-                // plugins: {
-                //     legend: {
-                //         display: false,
-                //     }
-                // },
                 scales: {
                     Primaire: {
                         type: 'linear',
@@ -226,24 +513,53 @@ function initOrUpdateGraph(nomCanvas, tableauAbscisse, listeDatasets) {
                             },
                         },
                     },
-                    // TODO enlever cet axe quand on en a pas besoins
-                    Secondaire: {
-                        type: 'linear',
-                        position: 'right',
-                        ticks: { beginAtZero: true, color: '#0c5b4f' },
-                        grid: {
-                            color: function(context) {
-                                return '#a1dbcd';
-                            },
-                        },
-                    }
                 }
             }
         })
     } else {
-        // TODO modifier les data, labels, couleur, type axes
-        chart.data.labels = tableauAbscisse
+        // modifier les data, labels, couleur, type axes
+        if (tableauAbscisse != undefined) {
+            chart.data.labels = tableauAbscisse
+        } else {
+            supprimerDatasetsFromChart(nomCanvas, datasetAajouter.id)
+            // il y a déjà un dataset avec l'unité du dataset à ajouter
+            if (Object.keys(chart.data.units).includes(datasetAajouter.unit)) {
+                datasetAajouter.yAxisID = chart.data.units[datasetAajouter.unit]["yAxisID"]
+                datasetAajouter.backgroundColor = shadeColor(chart.data.units[datasetAajouter.unit].backgroundColor, variationCouleur)
+                datasetAajouter.borderColor = shadeColor(chart.data.units[datasetAajouter.unit].borderColor, variationCouleur)
+            } else { // il n'y en a pas
+                if (chart.data.datasets.length == 0 || (chart.data.datasets.length == 1 && chart.data.units[Object.keys(chart.data.units)[0]]["yAxisID"] == "Secondaire")) {
+                    datasetAajouter.yAxisID = "Primaire"
+                    datasetAajouter.backgroundColor = "#c8dbfe"
+                    datasetAajouter.borderColor = "#0000ff"
+                } else if (chart.data.datasets.length == 1) {
+                    datasetAajouter.yAxisID = "Secondaire"
+                    datasetAajouter.backgroundColor = "#ccffcc"
+                    datasetAajouter.borderColor = "#00ff00"
+                } else {
+                    console.log("on peut pas ajouter de donnée le graphique est déjà plein")
+                    document.getElementById(datasetAajouter.id).click()
+                    console.log(checkboxChecked)
+                    console.log(chart.data.units)
+                    chart.update()
+                    return
+                }
+            }
+            
+            chart.data.units[datasetAajouter.unit] = {
+                yAxisID: datasetAajouter.yAxisID,
+                backgroundColor: datasetAajouter.backgroundColor,
+                borderColor: datasetAajouter.borderColor,
+                // nombre: nombre
+            }
+            
+            datasetAajouter.type = "line"
+            datasetAajouter.cubicInterpolationMode = "monotone"
+            // TODO ajouter l'unité sur les axes
+            chart.data.datasets.push(datasetAajouter)
+        }
         chart.update()
+        addOrRemoveAxeSecondaire(nomCanvas)
     }
 }
 
@@ -251,12 +567,7 @@ function genAbscisse(start, end) {
     // choix du pas en fonction de la taille de l'interval et de l'input user
     let intervalTimeStamp = end - start
     let maxCol = 62
-    let tablePas = {
-        heure: 3600,
-        jour: 24 * 3600,
-        mois: 24 * 3600 * 31,
-        annee: 24 * 3600 * 31 * 12
-    }
+    
     
     let pas = ""
     let inputPas = document.getElementById("pas")
@@ -279,6 +590,11 @@ function genAbscisse(start, end) {
     }
     inputPas.value = pas
 
+    let tableauAbscisse = repartirTemps(start, end, pas)
+    return [tableauAbscisse, pas]
+}
+
+function repartirTemps(start, end, pas) {
     let chaineAPush = undefined
     let tableauAbscisse = []
     let debut = new Date(start*1000)
@@ -325,22 +641,17 @@ function genAbscisse(start, end) {
     return tableauAbscisse
 }
 
-function genListeDatas(start, end) {
-    
-}
-
 function creerMultiChart(data, start, end, event) {
     let onduleursData = repartirDonneesParOnudleurs(data)
-
-    // création et mise à jour des checkbox d'affichage de données
-    creerInputs(onduleursData)
-
+    
     // update l'abscice donc le temps pck cette fonction est appellée à chaque changement de delta temps
-    let tableauAbscisse = genAbscisse(start, end)
+    let [tableauAbscisse, pas] = genAbscisse(start, end)
+    
+    // création et mise à jour des checkbox d'affichage de données
+    creerInputs(onduleursData, start, end, pas, tableauAbscisse)
 
-    // TODO resolve les inputs qui sont checkés pour qu'ils se raclculent
-    let listeDatasets = []
+    let listeDatasets = {}
 
     // initialistaion ou mise à jour du chart avec les nouveaux datasets et interval de temps
-    initOrUpdateGraph("canvasMultiChart", tableauAbscisse, listeDatasets)
+    initOrUpdateGraph("canvasMultiChart", tableauAbscisse=tableauAbscisse, listeDatasets)
 }
