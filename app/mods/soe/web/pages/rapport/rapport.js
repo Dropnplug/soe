@@ -16,6 +16,12 @@ var checkboxMasterUnchecked = []
 var detailsOpen = []
 
 function calculerMoyenneParIndice(objetListes) {
+    // fonction qui prend une object contenant des listes de tailles différente et qui pour chaque indice de chaque listes fait une moyenne
+    /* sous la forme {
+        [1, 2, 3],
+        [4, 2, 3, 5],
+        ...
+    }*/
     let moyenneParIndice = []
     let sommeParInd = []
     for (let liste in objetListes) {
@@ -31,11 +37,12 @@ function calculerMoyenneParIndice(objetListes) {
     moyenneParIndice.forEach((val, ind) => {
         moyenneParIndice[ind] = val/sommeParInd[ind]
     })
-
+    // retourne une liste de valeur moyenne
     return moyenneParIndice;
 }
 
 function calcMoyenne(data, start, pas, calculSpecifiqueAlaDonnee) {
+    // fonction qui parcours toutes les données remonter par la route /soe/site/getDataFromBdd/ et qui les répartis en fonction du PAS dans une liste ou chaque indice est réprésenter par un PAS (ex : PAS = jour, un indice = une journée)
     let donnees = []
     let debut = new Date(start*1000)
     let indCol = 0
@@ -52,6 +59,7 @@ function calcMoyenne(data, start, pas, calculSpecifiqueAlaDonnee) {
                 dateAvant = debut
             }
             dateActuelle = new Date(data[macOnduleur][reverseData[indice]]["time"])
+            // premier tour de boucle init de l'indice en fonction du pas
             if (indCol == 0) {
                 indColInit = true
                 indCol += getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
@@ -62,17 +70,22 @@ function calcMoyenne(data, start, pas, calculSpecifiqueAlaDonnee) {
                 donnees[indCol].somme = 0
             }
 
+            // fonction passée en paramètre qui fait une opération différente en fonction de chaque type de valeur
             calculSpecifiqueAlaDonnee(data, macOnduleur, reverseData, indice, donnees, indCol)
             donnees[indCol].somme += 1
+            // console.log(indCol)
             
             let difference = getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
             
+            // si il ya une différence c'est qu'il faut changer le indcol
             if (difference != 0) {
                 if (donnees[indCol].valeur != undefined) {
-                    donnees[indCol].valeur = Math.round((donnees[indCol].valeur/donnees[indCol].somme))
+                    // on calcul la moyenne pour cet indcol
+                    donnees[indCol].valeur = parseFloat((donnees[indCol].valeur/donnees[indCol].somme).toFixed(2))
                 }
                 donnees[indCol].somme = 0
                 if (!indColInit) {
+                    // on change le indcol en lui ajoutant le nombre de col de différecnce entre la date actuelle et la date d'avant
                     indCol += difference
                 }
             }
@@ -81,8 +94,10 @@ function calcMoyenne(data, start, pas, calculSpecifiqueAlaDonnee) {
         }
         if (donnees[indCol].valeur != undefined) {
             donnees[indCol].somme += 1
-            donnees[indCol].valeur = Math.round((donnees[indCol].valeur/donnees[indCol].somme))
+            // il faut faire cette opération suplémentaire car la boucle fort va systématiquement omettre le dernier élément
+            donnees[indCol].valeur = parseFloat((donnees[indCol].valeur/donnees[indCol].somme).toFixed(2))
         }
+        // rangement de la liste de valeur dans un object contenant toutes les listes de valeurs moyenne de tous les sous apareil (ex: de toutes les string si on veut les données d'un onduleur)
         res[macOnduleur] = []
         for (let i in donnees) {
             res[macOnduleur][i] = donnees[i].valeur
@@ -91,31 +106,38 @@ function calcMoyenne(data, start, pas, calculSpecifiqueAlaDonnee) {
     return res
 }
 
+function moyenneString(data, macOnduleur, reverseData, indice, nomDonnees) {
+    let somme = 0
+    let valeur = 0
+    let moy = 0
+    // moyenne des string et on ingore les string à 0 pour qu'elles n'influencent pas la moyenne
+    for (let pvString in data[macOnduleur][reverseData[indice]][nomDonnees]) {
+        valeur += Number(data[macOnduleur][reverseData[indice]][nomDonnees][pvString])
+        if (Number(data[macOnduleur][reverseData[indice]][nomDonnees][pvString]) != 0) {
+            somme++
+        }
+    }
+    if (somme != 0) {
+        moy += valeur/somme
+    } else { // si ya pas de somme ça veut dire que la string est vide et donc on la compte pas
+        moy += 0
+    }
+    return moy
+}
+
 // TODO les fonctions des data doivent toutes retournée une liste de données affichable par le chart avec le bon interval de temps
 const listeData = {
     "Puissance DC": (data, start, end, pas, checkboxId, label) => {
         let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
-            let somme = 0
-            let valeur = 0
-            for (let pvString in data[macOnduleur][reverseData[indice]]["puissance_dc"]) {
-                valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_dc"][pvString])
-                if (Number(data[macOnduleur][reverseData[indice]]["puissance_dc"][pvString]) != 0) {
-                    somme++
-                }
-            }
-            if (donnees[indCol] == undefined) {
-                donnees[indCol] = 0
-            }
-            if (somme != 0) {
-                donnees[indCol].valeur += valeur/somme
-            } else {
-                donnees[indCol].valeur += 0
-            }
+            // fonction de calcul spécifique de la donnée
+            donnees[indCol].valeur += moyenneString(data, macOnduleur, reverseData, indice, "puissance_dc")
         })
 
+        // toutes les infos spécifique à un dataset pour une données
         datasetAajouter = {
+                // il faut un liste de données et non un object contenant des listes
                 data: calculerMoyenneParIndice(res),
-                unit:"kw",
+                unit:"W",
                 id: checkboxId,
                 label: "Puissance DC" + " " + label
             }
@@ -123,12 +145,7 @@ const listeData = {
     },
     "Tension DC": (data, start, end, pas, checkboxId, label) => {
         let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
-            for (let pvString in data[macOnduleur][reverseData[indice]]["tension_dc"]) {
-                if (donnees[indCol] == undefined) {
-                    donnees[indCol] = 0
-                }
-                donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["tension_dc"][pvString])
-            }
+            donnees[indCol].valeur += moyenneString(data, macOnduleur, reverseData, indice, "tension_dc")
         })
 
         datasetAajouter = {
@@ -140,19 +157,187 @@ const listeData = {
     
         initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
     },
-    "Courant DC": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Puissance AC ": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Puissance AC L1": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Puissance AC L2": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Puissance AC L3": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Tension AC": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Tension AC L1": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Tension AC L2": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Tension AC L3": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Courant AC": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Courant AC L1": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Courant AC L2": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
-    "Courant AC L3": (data, start, end, pas, checkboxId, label) => {console.log(data, start, end, pas, checkboxId, label)},
+    "Courant DC": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += moyenneString(data, macOnduleur, reverseData, indice, "courant_dc")
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"A",
+            id: checkboxId,
+            label: "Courant DC" + " " + label
+        }
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Puissance AC ": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_ac"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"W",
+            id: checkboxId,
+            label: "Puissance AC" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Puissance AC L1": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_ac_par_phase"][0])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"W",
+            id: checkboxId,
+            label: "Puissance AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Puissance AC L2": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_ac_par_phase"][1])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"W",
+            id: checkboxId,
+            label: "Puissance AC L2" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Puissance AC L3": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_ac_par_phase"][2])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"W",
+            id: checkboxId,
+            label: "Puissance AC L3" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Tension AC": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["tension_ac"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"V",
+            id: checkboxId,
+            label: "Tension AC" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Tension AC L1": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["tension_ac_par_phase"][0])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"V",
+            id: checkboxId,
+            label: "Tension AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Tension AC L2": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["tension_ac_par_phase"][1])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"V",
+            id: checkboxId,
+            label: "Tension AC L2" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Tension AC L3": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["tension_ac_par_phase"][2])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"V",
+            id: checkboxId,
+            label: "Tension AC L3" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Courant AC": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["courant_ac"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"A",
+            id: checkboxId,
+            label: "Courant AC" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Courant AC L1": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["courant_ac_par_phase"][0])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"A",
+            id: checkboxId,
+            label: "Courant AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Courant AC L2": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["courant_ac_par_phase"][1])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"A",
+            id: checkboxId,
+            label: "Courant AC L2" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Courant AC L3": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["courant_ac_par_phase"][2])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"A",
+            id: checkboxId,
+            label: "Courant AC L3" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
     "Fréquence AC": (data, start, end, pas, checkboxId, label) => {
         let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
             donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["frequence_ac"])
@@ -167,11 +352,76 @@ const listeData = {
     
         initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
     },
-    "Fréquence AC L1": (data, start, end, pas) => {console.log(data, start, end, pas)},
-    "Fréquence AC L2": (data, start, end, pas) => {console.log(data, start, end, pas)},
-    "Fréquence AC L3": (data, start, end, pas) => {console.log(data, start, end, pas)},
-    "Facteur de limitation de puissance": (data, start, end, pas) => {console.log(data, start, end, pas)},
-    "Déphasage cos phi": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Fréquence AC L1": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["frequence_ac_par_phase"][0])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"Hz",
+            id: checkboxId,
+            label: "Fréquence AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Fréquence AC L2": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["frequence_ac_par_phase"][1])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"Hz",
+            id: checkboxId,
+            label: "Fréquence AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Fréquence AC L3": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["frequence_ac_par_phase"][2])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"Hz",
+            id: checkboxId,
+            label: "Fréquence AC L1" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Facteur de limitation de puissance": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["facteur_de_limitation_de_puissance"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"",
+            id: checkboxId,
+            label: "Facteur de limitation de puissance" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Déphasage cos phi": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["dephasage_cos_phi"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"",
+            id: checkboxId,
+            label: "Déphasage cos phi" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
     "Température": (data, start, end, pas, checkboxId, label) => {
         let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
             donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["temperature"])
@@ -186,8 +436,96 @@ const listeData = {
         
         initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
     },
-    "Puissance réactive": (data, start, end, pas) => {console.log(data, start, end, pas)},
-    "Énergie": (data, start, end, pas) => {console.log(data, start, end, pas)},
+    "Puissance réactive": (data, start, end, pas, checkboxId, label) => {
+        let res = calcMoyenne(data, start, pas, (data, macOnduleur, reverseData, indice, donnees, indCol) => {
+            donnees[indCol].valeur += Number(data[macOnduleur][reverseData[indice]]["puissance_reactive"])
+        })
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"",
+            id: checkboxId,
+            label: "Puissance réactive" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    },
+    "Énergie": (data, start, end, pas, checkboxId, label) => {
+        let donnees = []
+        let debut = new Date(start*1000)
+        let indCol = 0
+        let res = {}
+        for (let macOnduleur in data) {
+            let indColInit = false
+            indCol = 0
+            let dateAvant = undefined
+            let dateActuelle = undefined
+            let reverseData = Object.keys(data[macOnduleur]).reverse()
+            let premiereValeurDuPas = undefined
+            let donneeDuDernierPas = 0
+            donnees = []
+            for (let indice in reverseData) {
+                if (premiereValeurDuPas === undefined) {
+                    premiereValeurDuPas = Number(data[macOnduleur][reverseData[indice]]["energie_totale"])
+                }
+                
+                if (dateAvant == undefined) {
+                    dateAvant = debut
+                }
+                dateActuelle = new Date(data[macOnduleur][reverseData[indice]]["time"])
+                // premier tour de boucle init de l'indice en fonction du pas
+                if (indCol == 0) {
+                    indColInit = true
+                    indCol += getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
+                }
+                if (donnees[indCol] == undefined) {
+                    donnees[indCol] = {}
+                    donnees[indCol].valeur = 0
+                    donnees[indCol].somme = 0
+                }
+
+                // fonction passée en paramètre qui fait une opération différente en fonction de chaque type de valeur
+                calculSpecifiqueAlaDonnee(data, macOnduleur, reverseData, indice, donnees, indCol)
+                donnees[indCol].somme += 1
+                
+                let difference = getPasDifferenceEntreDate(dateAvant, dateActuelle, pas)
+                
+                // si il ya une différence c'est qu'il faut changer le indcol
+                if (difference != 0) {
+                    if (donnees[indCol].valeur != undefined) {
+                        // on calcul la moyenne pour cet indcol
+                        donnees[indCol].valeur = parseFloat((donnees[indCol].valeur/donnees[indCol].somme).toFixed(2))
+                    }
+                    donnees[indCol].somme = 0
+                    if (!indColInit) {
+                        // on change le indcol en lui ajoutant le nombre de col de différecnce entre la date actuelle et la date d'avant
+                        indCol += difference
+                    }
+                }
+                indColInit = false
+                dateAvant = new Date(data[macOnduleur][reverseData[indice]]["time"])
+            }
+            if (donnees[indCol].valeur != undefined) {
+                donnees[indCol].somme += 1
+                // il faut faire cette opération suplémentaire car la boucle fort va systématiquement omettre le dernier élément
+                donnees[indCol].valeur = parseFloat((donnees[indCol].valeur/donnees[indCol].somme).toFixed(2))
+            }
+            // rangement de la liste de valeur dans un object contenant toutes les listes de valeurs moyenne de tous les sous apareil (ex: de toutes les string si on veut les données d'un onduleur)
+            res[macOnduleur] = []
+            for (let i in donnees) {
+                res[macOnduleur][i] = donnees[i].valeur
+            }
+        }
+
+        datasetAajouter = {
+            data: calculerMoyenneParIndice(res),
+            unit:"",
+            id: checkboxId,
+            label: "Puissance réactive" + " " + label
+        }
+    
+        initOrUpdateGraph("canvasMultiChart", undefined, datasetAajouter)
+    }
 }
 
 function requestDataMultiChart(event, premiereFois=false) {
@@ -233,9 +571,10 @@ function getPasDifferenceEntreDate(dateAvant, dateActuelle, pas) {
     let difference = 0
     switch (pas) {
         case "heure":
-            dateAvant = dateAvant.getTime() / 1000
-            dateActuelle = dateActuelle.getTime() / 1000
-            difference = Math.round(Math.abs(dateActuelle - dateAvant) / 3600)
+            difference = dateActuelle.getHours() - dateAvant.getHours()
+            // dateAvant = dateAvant.getTime() / 1000
+            // dateActuelle = dateActuelle.getTime() / 1000
+            // difference = Math.round(Math.abs(dateActuelle - dateAvant) / 3600)
             break
         case "jour":
             dateAvant = dateAvant.getTime() / 1000
@@ -267,6 +606,7 @@ function repartirDonneesParOnudleurs(data) {
 }
 
 function checkCheckbox(details) {
+    // fonction qui active ou désactive toutes les checkbox d'un detail
         let elems = details.getElementsByTagName("input")
         elems = [...elems]
         let masterCheckbox = elems.shift()
@@ -295,6 +635,7 @@ function checkCheckbox(details) {
 }
 
 function creerDetail(elemParent, nomDetail, listeEtatCheckbox, typeAppareil) {
+    // fonction qui créer un elem detail dans un elemparent
     let detail = document.createElement("details")
     let summary = document.createElement("summary")
     let label = document.createElement("label")
@@ -303,6 +644,7 @@ function creerDetail(elemParent, nomDetail, listeEtatCheckbox, typeAppareil) {
     label.innerText = nomDetail
     detail.id = "detail_"+nomDetail
     detail.ontoggle = () => {
+        // on veut se souvenir de quelles sont les checkboc cochées ou non
         if (detail.open && detailsOpen.indexOf(detail.id) == -1) {
             detailsOpen.push(detail.id)
         } else if (detail.open == false) {
@@ -337,6 +679,7 @@ function creerDetail(elemParent, nomDetail, listeEtatCheckbox, typeAppareil) {
 }
 
 function creerCheckbox(elemParent, data, idAppareil, onduleursData, nom, start, end, pas) {
+    // fonction qui créer une checkbox
     let checkbox = document.createElement("input")
     let label = document.createElement("label")
     // TODO trouver le nom de l'onduleur
@@ -347,10 +690,10 @@ function creerCheckbox(elemParent, data, idAppareil, onduleursData, nom, start, 
     checkbox.id = idAppareil+data
     checkbox.onchange = () => {
         if (checkbox.checked) {
-            // appelle à la bonne fonction grâce au nom de la donnée
             if (!checkboxChecked.includes(checkbox.id)) {
                 checkboxChecked.push(checkbox.id)
             }
+            // appelle à la bonne fonction grâce au nom de la donnée
             listeData[data](onduleursData, start, end, pas, checkbox.id, nom)
         } else {
             supprimerDatasetsFromChart("canvasMultiChart", checkbox.id)
@@ -367,12 +710,13 @@ function creerCheckbox(elemParent, data, idAppareil, onduleursData, nom, start, 
     }
 }
 
-// TODO ajouter les string de panneau
 function creerInputs(onduleursData, start, end, pas) {
     let spanInputs = document.getElementsByClassName("inputsData")[0]
+    // on supprime tout
     spanInputs.innerHTML = ""
+    // TODO trouver le nom du site
     const nomSite = "Site"
-
+    
     // le site
     if (Object.keys(onduleursData).length != 0) {
         let detail = creerDetail(spanInputs, nomSite, checkboxMasterUnchecked, nomSite)
@@ -395,10 +739,13 @@ function creerInputs(onduleursData, start, end, pas) {
             object[macOnduleur] = onduleursData[macOnduleur]
             creerCheckbox(detail, data, macOnduleur+"_", object, macOnduleur, start, end, pas)
         }
+        // TODO ajouter les string de panneau
     }
 }
 
 const newShade = (hexColor, magnitude) => {
+    // fonction qui prend une couleur et la transforme dans une couleur un peut plus rouge
+    // merci stackoverflow
     hexColor = hexColor.replace(`#`, ``)
     if (hexColor.length === 6) {
         const decimalColor = parseInt(hexColor, 16)
@@ -418,7 +765,7 @@ const newShade = (hexColor, magnitude) => {
 }
 
 function addOrRemoveAxes(nomCanvas) {
-
+    // fonction qui regarde quels sont les unitées présentent dans le graph et suprime ou ajoute des axes en fonction de ça
     let chart = Chart.getChart(nomCanvas)
     let primaire = undefined
     let secondaire = undefined
@@ -477,7 +824,6 @@ function addOrRemoveAxes(nomCanvas) {
 
 function supprimerDatasetsFromChart(nomCanvas, idDataset) {
     let chart = Chart.getChart(nomCanvas)
-    
     let trouve = false
     let i = 0
     while (!trouve && i < chart.data.datasets.length) {
@@ -525,6 +871,7 @@ function compterNombreDonneePourUnite(unite, nomCanvas) {
 function initOrUpdateGraph(nomCanvas, tableauAbscisse=undefined, datasetAajouter) {
     let chart = Chart.getChart(nomCanvas)
     if (!chart) {
+        // création du graph
         let canvasMultiChart = document.getElementById(nomCanvas)
         let chartNew = new Chart(canvasMultiChart, {
             data: {
@@ -613,7 +960,6 @@ function initOrUpdateGraph(nomCanvas, tableauAbscisse=undefined, datasetAajouter
                 borderColor: datasetAajouter.borderColor,
             }
         } else {
-            // let nbDonnees = compterNombreDonneePourUnite(datasetAajouter.unit, nomCanvas)
             datasetAajouter.yAxisID = chart.data.units[datasetAajouter.unit].yAxisID
             datasetAajouter.backgroundColor = newShade(chart.data.units[datasetAajouter.unit].backgroundColor, (compterNombreDonneePourUnite(datasetAajouter.unit, nomCanvas)*40)%200)
             datasetAajouter.borderColor = newShade(chart.data.units[datasetAajouter.unit].borderColor, (compterNombreDonneePourUnite(datasetAajouter.unit, nomCanvas)*60)%200)
@@ -626,6 +972,7 @@ function initOrUpdateGraph(nomCanvas, tableauAbscisse=undefined, datasetAajouter
         chart.data.datasets.push(datasetAajouter)
         chart.update()
         addOrRemoveAxes(nomCanvas)
+        // centrage des donnée sur l'axe des abscice
         if (chart.options.scales.x.offset == false) {
             chart.options.scales.x.offset = true
             chart.update()
@@ -634,11 +981,9 @@ function initOrUpdateGraph(nomCanvas, tableauAbscisse=undefined, datasetAajouter
 }
 
 function genAbscisse(start, end) {
-    // choix du pas en fonction de la taille de l'interval et de l'input user
+    // choix du pas en fonction de la taille de l'interval et de l'input user 
     let intervalTimeStamp = end - start
     let maxCol = 62
-    
-    
     let pas = ""
     let inputPas = document.getElementById("pas")
     if (intervalTimeStamp / tablePas[inputPas.value] > maxCol) {
@@ -666,6 +1011,7 @@ function genAbscisse(start, end) {
 }
 
 function repartirTemps(start, end, pas) {
+    // génération du tableau de date à mettre en abscice du graphique en fonction du pas
     let chaineAPush = undefined
     let tableauAbscisse = []
     let debut = new Date(start*1000)
@@ -724,7 +1070,6 @@ function creerMultiChart(data, start, end, event) {
     creerInputs(onduleursData, start, end, pas)
     
     let listeDatasets = {}
-    
     // initialistaion ou mise à jour du chart avec les nouveaux datasets et interval de temps
     initOrUpdateGraph("canvasMultiChart", tableauAbscisse=tableauAbscisse, listeDatasets)
 }

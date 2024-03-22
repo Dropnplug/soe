@@ -101,7 +101,7 @@ class Onduleur():
         data["puissance_ac"] = self.getPac()
         data["puissance_ac_par_phase"] = self.getPacPP()
         data["tension_ac"] = self.getTac()
-        data["tension_ac_par_phase"] = self.getPacPP()
+        data["tension_ac_par_phase"] = self.getTacPP()
         data["courant_ac"] = self.getCac()
         data["courant_ac_par_phase"] = self.getCacPP()
         data["frequence_ac"] = self.getFac()
